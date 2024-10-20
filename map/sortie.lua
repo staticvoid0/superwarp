@@ -269,7 +269,7 @@ return T {
         end
         -------------------------------------------------------------------
         if not ( -- NPCs:
-        (menu_id >= 1000 and menu_id <= 1023)) then
+        (menu_id >= 1000 and menu_id <= 1021)) then
             return "Incorrect menu detected! Menu ID: " .. menu_id
         end
         -- prevent warping to gadgets or devices from bitzers
