@@ -322,3 +322,8 @@ Thanks to Staticvoid for researching and implementing the Sortie, Odyssey, Temen
 - **Resolved**: An issue wherein loading or reloading superwarp on multiple characters simultaneously could flash the settings.xml file, resetting to default values. Each character now has their own xml file.
 - **Resolved**: An issue that could cause the user to freeze or crash when touching a warp device, accidentally or otherwise, while superwarp was active.
 - **Resolved**: Minor bugs.
+
+#### v1.1.1
+- **Feature**: Waypoints now accept partially typed destination names for all locations, not just the zone names. Go ahead and type //sw mumm  to go to Mummers' Coalition  or //sw pion  to go to Pioneers' Coalition etc. Superwarp will now know what you meant :D
+- **Resolved**: A bug where limbus chest tracking could become imperfect if the determined next chest was not opened.
+- **Improvement**: NPC distance measurement and requirement.

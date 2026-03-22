@@ -45,10 +45,11 @@ _addon.name = 'superwarp'
 
 _addon.author = 'Akaden'
 
-_addon.version = '1.1'
+_addon.version = '1.1.1'
 
 _addon.commands = {'sw','superwarp'}
 
+require('vectors')
 require('tables')
 require('logger')
 require('functions')
@@ -174,18 +175,36 @@ local state = {
 
 local function add_table_entry(zone, entry)
     local t = settings.limbus_chests[zone]
-    if not t then return end
-    if t[entry] == 1 then return end
-    t[entry] = 1
-
-    for k, v in pairs(t) do
-        if k ~= entry then
-            t[k] = v + 1
-            if t[k] > 4 then
-                t[k] = 4
-            end
-        end
+    if not t or not t[entry] then
+        return
     end
+
+    if t[entry] == 1 then
+        return
+    end
+
+    local chests = {}
+
+    for name, rank in pairs(t) do
+        chests[#chests + 1] = {name = name, rank = rank}
+    end
+
+    table.sort(chests, function(a, b)
+        if a.name == entry then
+            return true
+        elseif b.name == entry then
+            return false
+        elseif a.rank ~= b.rank then
+            return a.rank < b.rank
+        else
+            return a.name < b.name
+        end
+    end)
+
+    for i, chest in ipairs(chests) do
+        t[chest.name] = i
+    end
+
     config.save(settings)
 end
 
@@ -263,6 +282,34 @@ local function resolve_shortcuts(t, selection)
     if selection.shortcut == nil then return selection end
 
     return resolve_shortcuts(t, t[selection.shortcut])
+end
+
+local function resolve_waypoint_subzone(map_name, search_term)
+    local best_zone, best_sub_zone, best_score, best_map
+
+    for zone_name, zone_map in pairs(maps[map_name].warpdata) do
+        if type(zone_map) == 'table' and not (zone_map.index or zone_map.shortcut) then
+            local sub_keys = get_keys(zone_map)
+            local sub_name, sub_score = fmatch(search_term, sub_keys)
+
+            if sub_name and sub_score then
+                local sub_zone_map = zone_map[sub_name]
+                if sub_zone_map then
+                    sub_zone_map = resolve_shortcuts(zone_map, sub_zone_map)
+                    if sub_zone_map and sub_zone_map.index then
+                        if not best_score or sub_score > best_score then
+                            best_zone = zone_name
+                            best_sub_zone = sub_name
+                            best_score = sub_score
+                            best_map = sub_zone_map
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return best_zone, best_sub_zone, best_map, best_score
 end
 
 local function resolve_warp(map_name, zone, sub_zone)
@@ -345,15 +392,28 @@ local function resolve_warp(map_name, zone, sub_zone)
             debug("Found zone settings. No sub-zones defined.")
             return zone_map, closest_zone_name    
         end
+    elseif map_name == 'waypoints' then
+        local subzone_term = zone and zone:match('([^%s]+)$') or zone
+        local global_zone, global_sub_zone, global_map, global_score = resolve_waypoint_subzone(map_name, subzone_term)
+        if global_map and global_score and global_score >= 3 and global_score >= #subzone_term then
+            debug('Global sub-zone search success. Term="'..subzone_term..'", zone="'..global_zone..'", sub-zone="'..global_sub_zone..'", value='..global_score)
+            return global_map, global_zone..' - '..global_sub_zone
+        elseif zone and closest_zone_name then
+            log('Search returned no matches: '..zone)
+            debug('Failed search. Term="'..zone..'", nearest match="'..(closest_zone_name or nil)..'", value='..(closest_zone_value or '-1'))
+        else
+            log('Search returned no matches.')
+            debug('Failed search.')
+        end
     elseif zone and closest_zone_name then
         log('Search returned no matches: '..zone)
         debug('Failed search. Term="'..zone..'", nearest match="'..(closest_zone_name or nil)..'", value='..(closest_zone_value or '-1'))
     else
         log('Search returned no matches.')
         debug('Failed search.')
-    return nil
     end
-end 
+    return nil
+end
 
 function poke_npc(id, index)
     local first_poke = true
@@ -433,15 +493,16 @@ end
 local function find_npc(needles)
     local player = windower.ffxi.get_mob_by_target('me')
     local target_npc, distance, npc_key = nil, nil, nil
-
+    if not player then
+        return nil, nil, nil
+    end
+    local px, py, pz = player.x, player.y, player.z
     for index, npc_data in pairs(needles) do
         local npc = windower.ffxi.get_mob_by_index(index)
         if npc and npc.valid_target then
-            local pos_y = math.abs(npc.y - player.y)
-            local pos_z = math.abs(npc.z - player.z)
-            local pos_x = math.abs(npc.x - player.x)
-            local true_distance = math.sqrt(pos_x^2 + pos_y^2 + pos_z^2)
-            if true_distance < 15 then
+            local diff_vec = V{npc.x - px, npc.y - py, npc.z - pz}
+            local true_distance = diff_vec:length()
+            if true_distance < 25 then
                 if not target_npc or npc.distance < distance then
                     target_npc = npc
                     distance = npc.distance
