@@ -145,8 +145,8 @@ end
 if settings.simulated_response_time > 5 then
     settings.simulated_response_time = 5
 end
-if settings.default_packet_wait_timeout < 1 then
-    settings.default_packet_wait_timeout = 1
+if settings.default_packet_wait_timeout < 3 then
+    settings.default_packet_wait_timeout = 3
 end
 if settings.default_packet_wait_timeout > 10 then
     settings.default_packet_wait_timeout = 10
@@ -166,13 +166,19 @@ if not (maps.abyssea.target_ids and maps.campaign.target_ids and maps.odyssey.al
 else
     smartcheck = true
 end
+local intended_npc = nil
+local warp_ident = nil
 local state = {
+    retry_scheduled = nil,
+    warp_interrupted = nil,
+    warp_confirmed = nil,
     loop_count = nil,
     fast_retry = false,
     debug_stack = T{},
     client_lock = false,
 }
 
+local prev_location = nil
 local function add_table_entry(zone, entry)
     local t = settings.limbus_chests[zone]
     if not t or not t[entry] then
@@ -418,9 +424,14 @@ end
 function poke_npc(id, index)
     local first_poke = true
     local first_retry = true
+    if not intended_npc.id then
+        current_activity.poked_npc_index, intended_npc.index = index, index
+        current_activity.poked_npc_id, intended_npc.id = id, id
+    elseif not current_activity.poked_npc_id then
+        current_activity.poked_npc_index = intended_npc.index
+        current_activity.poked_npc_id = intended_npc.id
+    end
     while id and index and current_activity and not current_activity.caught_poke do
-        current_activity.poked_npc_index = index
-        current_activity.poked_npc_id = id
         if not first_poke then
             if state.loop_count > 0 then
                 state.loop_count = state.loop_count - 1
@@ -540,7 +551,7 @@ local function reset(quiet)
         packet["Zone"]=windower.ffxi.get_info()['zone']
         packet["Menu ID"]=last_menu
         packets.inject(packet)
-        last_activity = activity
+        last_activity = current_activity
         if current_activity then
             current_activity.canceled = true
         end
@@ -550,7 +561,7 @@ local function reset(quiet)
         last_menu = nil
 
         if not quiet then
-            log('Should be reset now. Please try again. If still locked, try a second reset.')
+            state.loop_count = 0 -- If we did a cancel / reset command we want to cancel the warp queue.
         end
     else
         general_release()
@@ -559,6 +570,7 @@ local function reset(quiet)
         last_menu = nil
         current_activity = nil
         if not quiet then
+            state.loop_count = 0 -- If we did a cancel / reset command we want to cancel the warp queue.
             log('No warp scheduled.')
         end
     end
@@ -623,7 +635,7 @@ local function do_warp(map_name, zone, sub_zone)
             log("You are already at "..display_name.."! Teleport canceled.")
             state.loop_count = 0
         elseif npc.id and npc.index then
-            current_activity = {type=map_name, npc=npc, activity_settings=warp_settings, zone=zone, sub_zone=sub_zone}
+            current_activity = {type=map_name, npc=npc, activity_settings=warp_settings, zone=zone, sub_zone=sub_zone, warp_ident = warp_ident}
             handle_before_warp()
             log('Warping via ' .. npc.name .. ' to '..display_name..'.')
             timing.warp_init_time = os.clock()
@@ -635,6 +647,7 @@ local function do_warp(map_name, zone, sub_zone)
             poke_npc(npc.id, npc.index)
         end
     else
+        timing.warp_cmd_time = nil
         state.loop_count = 0
     end
 end
@@ -664,7 +677,7 @@ local function do_sub_cmd(map_name, sub_cmd, args)
             timing.warp_cmd_time = nil
         end
     elseif npc and npc.id and npc.index and dist <= 6^2 then
-        current_activity = {type=map_name, sub_cmd=sub_cmd, args=args, npc=npc}
+        current_activity = {type=map_name, sub_cmd=sub_cmd, args=args, npc=npc, warp_ident = warp_ident}
         handle_before_warp()
         timing.warp_init_time = os.clock()
         if timing.warp_cmd_time then
@@ -703,7 +716,7 @@ local function do_find_missing_destinations(map_name, args)
         if #args > 0 then
             max_results = tonumber(args[1]) or 999999 
         end
-        current_activity = {type=map_name, find_missing=true, missing_max=max_results, args=args, npc=npc}
+        current_activity = {type=map_name, find_missing=true, missing_max=max_results, args=args, npc=npc, warp_ident = warp_ident}
         timing.warp_init_time = os.clock()
         if timing.warp_cmd_time then
             debug("Warp initialization time: "..string.format("%.3f", timing.warp_init_time - timing.warp_cmd_time).." seconds")
@@ -828,12 +841,17 @@ local function handle_warp(warp, args, fast_retry, retries_remaining)
 end
 
 local function received_warp_command(cmd, args)
+    local player = windower.ffxi.get_mob_by_target('me')
+    prev_location = {x = player.x, y = player.y, z = player.z}
+    warp_ident = ((warp_ident and warp_ident) or 0) + 1
     if not timing.warp_cmd_time then
         timing.warp_cmd_time = os.clock()
     end
     if current_activity ~= nil then
         log('Superwarp is currently busy. To cancel the last request try "//sw cancel"')
     else
+        intended_npc = {}
+        state.warp_confirmed = false
         if not smartcmd then
             state.debug_stack = T{}
         end
@@ -1155,6 +1173,72 @@ function receive_send_all(msg)
     end
 end
 
+local function auto_shutdown(id) -- Ensure that if the same process ID is still open after a reasonable amount of time after the indicator has been triggered, it gets shut down and systems reset.
+    if current_activity and current_activity.warp_ident == id then
+        debug("The warp has not finished or progressed since the NPC interaction anomoly and superwarp detects no new warp IDs. Resetting..")
+        state.loop_count = 0
+        last_activity = current_activity
+        current_activity = nil
+        reset(true)
+    end
+end
+
+local function read_warp_state(i,id)
+    if current_activity and id ~= current_activity.warp_ident then
+        debug("A different warp has commenced now, leaving it to its own devices.")
+        return
+    elseif current_activity and current_activity.action_index ~= i then
+        debug("Warp state has progressed, leaving it to its own devices.")
+        return
+    elseif not current_activity then
+        debug("No current activity, nothing needs reset.")
+        return
+    end
+    auto_shutdown:schedule(5, id)
+end
+
+local function movement_confirm(menu_confirm)
+    if state.warp_interrupted then
+        local player = windower.ffxi.get_mob_by_target('me')
+        local diff_vector = V{prev_location.x - player.x, prev_location.y - player.y, prev_location.z - player.z}
+        local has_moved = diff_vector:length() >= 25
+        if has_moved then
+            if not state.warp_confirmed then
+                debug("Detected an interrupted warp, confirming the warp with complete menu.")
+                log("Detected an interrupted warp, now confirming. Floor data progress bar should appear.")
+                packets.inject(menu_confirm.packet)
+                state.warp_interrupted = false
+                state.warp_confirmed = true
+                state.loop_count = 0
+                if current_activity then
+                    last_activity = current_activity
+                end
+                current_activity = nil
+                return true
+            end
+            return true
+        else
+            return false
+        end
+    end
+end
+
+local function limbus_state_reader(executor)
+    if executor then
+        local limbus_warp_retainer = current_activity.action_queue[4]
+        --print("Scheduling position check for 5s.")
+        movement_confirm:schedule(5, limbus_warp_retainer)
+    else
+        if current_activity.action_index == 1 then
+            --print("Resetting our flags, a new warp sequence has started in earnest.")
+            state.warp_interrupted = false
+        elseif current_activity.action_index == 4 then
+            --print("Confirmed Warp")
+            state.warp_confirmed = true
+        end
+    end
+end
+
 local function perform_next_action()
     if current_activity and current_activity.running and current_activity.action_queue and current_activity.action_index > 0 then
         local current_action = current_activity.action_queue[current_activity.action_index]
@@ -1181,28 +1265,38 @@ local function perform_next_action()
                 current_action.timeout = settings.default_packet_wait_timeout
             end
             local fn = function(s, ca, i, p, d)
+                if state.retry_scheduled then
+                    state.retry_scheduled = false
+                end
                 if ca and ca.action_index == i and not ca.canceled then
                     debug("timed out waiting for packet 0x"..p:hex().." for action "..tostring(i)..' '..(d or ''))
-
                     if s.loop_count > 0 then
                         reset(true)
                         log("Timed out waiting for response from the menu. Retrying...")
-                        handle_warp:schedule(settings.retry_delay, s.current_warp, s.current_args, false, s.loop_count - 1)
+                        handle_warp:schedule(settings.retry_delay, s.current_warp, s.current_args, false, s.loop_count - 0.2)
                     else
                         reset(true)
                         log("Timed out waiting for response from the menu.")
                     end
                 end
             end
-
-            fn:schedule(current_action.timeout, state, current_activity, current_activity.action_index, current_action.wait_packet, current_action.description)
+            if not state.retry_scheduled then  -- Only allow one fn() call to be scheduled at a time. Increase accountability.
+                state.retry_scheduled = true
+                fn:schedule(current_action.timeout, state, current_activity, current_activity.action_index, current_action.wait_packet, current_action.description)
+            end
         elseif not state.fast_retry and current_action.delay and current_action.delay > 0 then
             debug("delaying action "..tostring(current_activity.action_index)..' '..(current_action.description or '')..' for '.. current_action.delay..'s...')
             local delay_seconds = current_action.delay
             current_action.delay = nil
             last_action = current_action
             perform_next_action:schedule(delay_seconds)
+            if in_limbus_zone and current_activity.action_index == 4 then  -- Often when limbus warps have gotten to this point and then get interrupted from being attacked the warp can still go through leading to missing data bar for that floor. Handle these cases by scheduling a check.
+                limbus_state_reader(true)
+            end
         elseif current_action.packet then
+            if in_limbus_zone then  --Simple flag check to gate further checks, no further checks outside of limbus.
+                limbus_state_reader()
+            end
             -- just a packet, inject it.
             debug("injecting packet "..tostring(current_activity.action_index)..' '..(current_action.description or ''))
             packets.inject(current_action.packet)
@@ -1233,6 +1327,7 @@ local function perform_next_action()
         end
     end
 end
+
 -- Handle menu interraction. 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
     if current_activity and current_activity.action_queue and current_activity.running then
@@ -1306,10 +1401,12 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             if state.loop_count > 0 then
                 if settings.enable_fast_retry_on_interrupt then
                     log("Detected event-skip. Retrying (fast)...")
-                    handle_warp:schedule(0.1, state.current_warp, state.current_args, true, state.loop_count - 1)
+                    state.warp_interrupted = true
+                    handle_warp:schedule(0.1, state.current_warp, state.current_args, true, state.loop_count - 0.2)
                 else
                     log("Detected event-skip. Retrying...")
-                    handle_warp:schedule(0.1, state.current_warp, state.current_args, false, state.loop_count - 1)
+                    state.warp_interrupted = true
+                    handle_warp:schedule(0.1, state.current_warp, state.current_args, false, state.loop_count - 0.2)
                 end
             end
         end
@@ -1320,24 +1417,30 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         
         if current_activity and not current_activity.running then
             current_activity.caught_poke = true
-            timing.poke_response_time = os.clock()
-            debug("Response time: "..string.format("%.2f", timing.poke_response_time - timing.poke_time).." seconds")
+            if timing.poke_time then
+                timing.poke_response_time = os.clock()
+                debug("Response time: "..string.format("%.2f", timing.poke_response_time - timing.poke_time).." seconds")
+            else
+                debug("Poke time nil.")
+            end
             timing.poke_response_time = nil
             local zone = windower.ffxi.get_info()['zone']
             local map = maps[current_activity.type]
-
-            if current_activity.poked_npc_id ~= p["NPC"] or current_activity.poked_npc_index ~= p["NPC Index"] then
-                log("Incorrect npc detected. Canceling action.")
-                last_activity = current_activity
-                state.loop_count = 0
-                current_activity = nil
-                return false
-            end
-
+            
             last_menu = p["Menu ID"]
             last_npc = p["NPC"]
             last_npc_index = p["NPC Index"]
+
             --debug("recorded reset params: "..last_menu.." "..last_npc)
+
+            if current_activity.poked_npc_id ~= p["NPC"] or current_activity.poked_npc_index ~= p["NPC Index"] then
+                log("This is not the NPC the warp was meant for. Shutting it down.")
+                last_activity = current_activity
+                state.loop_count = 0
+                current_activity = nil
+                reset:schedule(0.5, true)
+                return true
+            end
 
             if current_activity.find_missing then
                 debug("Finding missing destinations")
@@ -1404,6 +1507,13 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 current_activity = nil
                 return false
             end
+        elseif current_activity then
+            print("Prevented menu from blocking warp, will automatically end this warp sequence if it has gone stale.")
+            debug("Prevented menu from blocking packet exchanges, reading state machine...")
+            local i = current_activity and current_activity.action_index
+            local ident = current_activity.warp_ident -- Capture Warp ID now and check in 5 seconds to determine whether a reset is needed.  (State machine accountability improvement)
+            read_warp_state:schedule(5, i, ident)
+            return true
         end
     end
 end)
@@ -1492,8 +1602,10 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
 end)
 windower.register_event('load', function()
     if not settings.understood then
-        windower.add_to_chat(207,'\n Now use sw in place of  hp, wp, sg, un, so, li, ew, ab etc -  for all warp commands!!\n The new smart-command is "//sw" by itself. It autohandles all warp scenarios where a destination need not be specified. i.e. so port or ab enter. It works as any subcommand for any map except others where multiple are usable, in those cases it always serves as one. i.e. next cmd for limbus.')
+        windower.add_to_chat(207,'\n Welcome to superwarp 1.1.1. Now use sw in place of  hp, wp, sg, un, so, li, ew, ab etc -  for all warp commands!!\n The new smart-command is "//sw" by itself. It autohandles all warp scenarios where a destination need not be specified. i.e. so port or ab enter. It works as any subcommand for any map except others where multiple are usable, in those cases it always serves as one. i.e. next cmd for limbus.')
         windower.add_to_chat(207,' All legacy functionality is unchanged.')
+        windower.add_to_chat(207,' The interrupt/retry system has been re-tooled to make it more focused and intentional. It is no longer possible to have an additional warp go through from a single command when attacked and interrupted during warp procedure. (No more basement re-entries in Sortie.) Limbus warp interrupts can no longer result in missing data bars.')
+        windower.add_to_chat(207,' sw help to list all information.')
         windower.add_to_chat(207,' sw understood to stop displaying these messages on load.')
     end
     windower.add_to_chat(207,' sw help to list all information.')
