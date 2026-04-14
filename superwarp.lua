@@ -1508,7 +1508,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 return false
             end
         elseif current_activity then
-            print("Prevented menu from blocking warp, will automatically end this warp sequence if it has gone stale.")
             debug("Prevented menu from blocking packet exchanges, reading state machine...")
             local i = current_activity and current_activity.action_index
             local ident = current_activity.warp_ident -- Capture Warp ID now and check in 5 seconds to determine whether a reset is needed.  (State machine accountability improvement)
