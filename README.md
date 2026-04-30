@@ -3,11 +3,22 @@
 This is an addon for Windower4 for FFXI. It allows text commands to teleport using Homepoints, Waypoints, Proto-Waypoints, Survival Guides, Escha Portals and Reisenjima Ingresses, Voidwatch and Unity NPCs, Abyssea Confluxes, Runic Portals, Odyssey Confluxes and Translocators, and Sortie Gadgets, Bitzers, and Devices, Temenos Matter Diffusion Modules and Apollyon Swirling Vortices, Incursion Rusted Transmitters, Walk Of Echoes Confluxes.
 
 ### Commands:
+The //sw command prefix can now be used for all maps. It may still be used in the manner it was previously if the user so desired.
+
+#### Misc. Commands
+| Command | Action |
+| --- | --- |
+| //sw debug  | Toggles debug mode which displays debug messages in the log. If debug mode was off, will display the debug logs of the last warp command as well.   |
+| //sw missing | Displays the destinations the user is missing from the warp system nearest you where applicable. |
+|(New!) //sw default / hpdefault | Toggles default homepoint destinations between Legacy and New. |
+|(New!) //sw display | Toggles sendall confirmation display. |
+| //sw cancel [all/party]  | Cancels the current in-progress warp.   |
+| //sw reset [all/party]  | Resets client menu lock. This should be exceedingly rare, but it's here in case it's needed.   |
 
 #### The superwarp™ (New!)
 | Command | Action |
 | --- | --- |
-| //sw [a/p]  One command to rule them all. Passes the appropriate command for the circumstance. Some users might consider a hotkey for this, like alt + S to pass the smartcommand with no typing and no macro. "all" and "party" will send an ipc message to all local instances (or specific local party members) with a delay (otherwise it will get stuck).
+| //sw [a/p]  One command to rule them all. Passes the appropriate command for the circumstance. Some users might consider a hotkey for this, like alt + S to pass the smartcommand with no typing and no macro and  ctrl + alt + S to pass the smartcommand to all party members (sw p) . "all" and "party" will send an ipc message to all local instances (or specific local party members) with a delay (otherwise it will get stuck).
 
 ---
 
@@ -129,14 +140,6 @@ This is an addon for Windower4 for FFXI. It allows text commands to teleport usi
 |//[sw] woe [all/party] enter | Enter a battlefield you are standing within 6 yalms of while inside Walk Of Echoes. (There is no point at which more than one conflux is <= 6 yalms.) "all" and "party" will send an ipc message to all local instances (or specific local party members) with a delay (otherwise it will get stuck).
 |//[sw] woe [all/party] exit | Exit a battlefield inside Walk Of Echoes. "all" and "party" will send an ipc message to all local instances (or specific local party members) with a delay (otherwise it will get stuck).
 |alt cmd: we |
-
-#### Misc. Commands
-| Command | Action |
-| --- | --- |
-| //sw debug  | Toggles debug mode which displays debug messages in the log. If debug mode was off, will display the debug logs of the last warp command as well.   |
-| //sw missing | Displays the destinations the user is missing from the warp system nearest you where applicable. |
-| //sw cancel [all/party]  | Cancels the current in-progress warp.   |
-| //sw reset [all/party]  | Resets client menu lock. This should be exceedingly rare, but it's here in case it's needed.   |
 
 ### Fuzzy Zone Names
 
@@ -312,7 +315,7 @@ Thanks to Staticvoid for researching and implementing the Sortie, Odyssey, Temen
 - **Feature**: Incursion warp system added.
 - **Feature**: Walk Of Echoes warp system added.
 - **Feature**: New command (port) added to Campaign map to travel back and forward through Cavernous Maws.
-- **Improvement**: Homepoints now defaults to the most popular homepoint of frequently visited zones when a sub-command is not specified; This allows the user to leverage the fuzzyfind feature and command interpretation to execute common warps with very little typing. Examples - '//sw no' = Norg #2, '//sw eas' = Eastern Adoulin #2 with no custom alias configuration. 
+- **Improvement**: In 'New' mode. (//sw default) Homepoints now defaults to the most popular homepoint of frequently visited zones when a sub-command is not specified; This allows the user to leverage the fuzzyfind feature and command interpretation to execute common warps with very little typing. Examples - '//sw nor' = Norg #2, '//sw eas' = Eastern Adoulin #2 with no custom alias configuration. 
 - **Improvement**: Waypoints now default to the Frontier Station of non-town zones when a sub-zone destination is not given, defaults to AH for Eastern Adoulin, and MH for Western Adoulin.
 - **Improvement**: (Waypoints) Shortcut added to more easily travel to Frontier Station; There are now multiple accepted inputs such as 'front' and 'frontier' to go these WPs. Some users may have struggled with this in the past if unaware of the pre-programmed 'fs' alias.
 - **Improvement**: Smart command. '//sw' Sortie Device warps now use logic to take the user to the next logical destination for a 9-Boss run based on main job and progress in the run. DHABCGFE. (Corsair gets sent to B if they do not have B shard, start if they do etc). Because of this it is possible to use one command for the entire 9boss run. /console sw  or  //sw   or hotkey Alt + S (sw)
@@ -325,6 +328,18 @@ Thanks to Staticvoid for researching and implementing the Sortie, Odyssey, Temen
 - **Resolved**: Minor bugs.
 
 #### v1.1.1
-- **Feature**: Waypoints now accept partially typed destination names for all locations, not just the zone names. Go ahead and type //sw mumm  to go to Mummers' Coalition  or //sw pion  to go to Pioneers' Coalition etc. Superwarp will now know what you meant :D
+- **Feature**: Waypoints now accept partially typed destination names for all locations, not just the zone names. Go ahead and type //sw mumm  to go to Mummers' Coalition  or //sw pion  to go to Pioneers' Coalition etc. superwarp will now know what you meant :D
+- **Feature**: A command has been added to toggle the default homepoint for popular zones between 'Legacy' and 'New', //sw default.
+- **Feature**: A command has been added to toggle the display of all / party warp progress, //sw display.
+- **Feature**: A small translucent box has been added that shows the progress of 'all' or 'party' warps in addition to chatlog messages that report the results. (Only applies to 'all' or 'party' warps.) The box vanishes after 15 seconds or upon confirming all warps.
+- **Improvement**: Sortie warp object unlock checks are no longer delayed on account of dependence on inventory loading for temp item check, but instead are done instantly upon interacting with them.
+- **Improvement**: CN destinations added to Limbus map with appropriate open checks.
+- **Improvement**: The reset / cancel command (manual reset) now sets retries to 0, so it ends a warp command.
+- **Improvement**: NPC distance measurement improvements.
+- **Improvement**: sendall warp operation time has been reduced.
+- **Improvement**: The chances of warp succeeding while being attacked has been greatly increased.
+- **Resolved**: A bug where the user could wind up stuck on a floor in limbus, getting the message "Nothing out of the ordinary here." when touching the elevators.
+- **Resolved**: A bug that could occur due to interrupts / retries where the user could change floors in limbus and have a missing data bar. (Still possible if attacked and interrupted at the right time, but very unlikely and only in favor of ensuring the aforementioned bug cannot occur.)
+- **Resolved**: A bug that could occur due to interrupts / retries where the user could re-enter the basement in Sortie, each warp command and its retries are now invariably locked to a single NPC. Warps will now auto-cancel if a different NPC is detected after warping. Rest easy exiting Sortie basements even under heavy attack. :)
+- **Resolved**: A bug involving interrupt / retries wherein a warp's subcommand could get dropped, changing the warp to a stardard warp with a default destination - in the case of limbus this would result in (protected) attempt(s) to warp to W1 in Temenos or NE5 attempt(s) in Apollyon, which are the first destinations read from the warpdata table.
 - **Resolved**: A bug where limbus chest tracking could become imperfect if the determined next chest was not opened.
-- **Improvement**: NPC distance measurement and requirement.

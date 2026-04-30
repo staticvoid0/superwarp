@@ -4,7 +4,6 @@ local npc_names = T{
 }
 -- Which homepoint we go to when we specify a zone, whether in shorthand or longform, and not a sub-zone location. QoL
 -- Others are already the most ideal homepoint for a given zone or there is only one homepoint.
---[[
 local default_by_keyword = {
     jeuno = "1", -- Jeuno zones
     nor = "2", -- Norg AH
@@ -22,7 +21,6 @@ local default_by_keyword = {
     mine = "3", -- Bastok Mines alchemy
     sou = "1", --Southern San d'Oria 1 Sparks, Unity, Voidwatch, Exit, Deeds, Copper Voucher exchange.
 }
-    ]]
 return T{ -- option: 2
     short_name = {'hp','ho'},
     long_name = 'Homepoint',
@@ -70,21 +68,22 @@ return T{ -- option: 2
     end,
     help_text = "| Homepoints |\n Command options [hp, ho]\n- hp zone name [homepoint_number] -- warp to a designated homepoint.\n- hp set -- set the closest homepoint as your return homepoint\n-----------------------------",
     sub_zone_targets = S{'entrance', 'mog house', 'auction house', '1', '2', '3', '4', '5', '6', '7', '8', '9', },
-    --[[
     auto_select_sub_zone = function(zone, specified)
-        local destiny = specified.zone:lower()
-        if not specified.subzone then
-            for keyword, value in pairs(default_by_keyword) do
-                if destiny:find(keyword, 1, true) then
-                    return value
+        if not specified.legacy then
+            local destiny = specified.zone:lower()
+            if not specified.subzone then
+                for keyword, value in pairs(default_by_keyword) do
+                    if destiny:find(keyword, 1, true) then
+                        return value
+                    end
                 end
+            else
+                return nil
             end
-            return "ah"
         else
             return nil
         end
     end,
-    ]]
     build_warp_packets = function(current_activity, zone, p, settings)
         local actions = T{}
         local packet = nil

@@ -2,11 +2,11 @@ local settings = nil
 local entry_zones = S{33}
 local limbus_zones = S{37,38}
 local npc_names = T{
-    port = S{'Swirling Vortex','Matter Diffusion Module'},
-    ['next'] = S{'Swirling Vortex','Matter Diffusion Module'},
-	['random'] = S{'Swirling Vortex','Matter Diffusion Module'},
-	back = S{'Swirling Vortex','Matter Diffusion Module'},
-    warp = S{'Swirling Vortex','Matter Diffusion Module'},
+    port = S{'Swirling Vortex','Matter Diffusion Module','Exit'},
+    ['next'] = S{'Swirling Vortex','Matter Diffusion Module','Exit'},
+	['random'] = S{'Swirling Vortex','Matter Diffusion Module','Exit'},
+	back = S{'Swirling Vortex','Matter Diffusion Module','Exit'},
+    warp = S{'Swirling Vortex','Matter Diffusion Module','Exit'},
     enter = S{'Swirling Vortex'},
     ['exit'] = S{'Radiant Aureole'},
 }
@@ -33,6 +33,7 @@ local npc_names = T{
 	   SE2 = {display_name = 'Southeast 2', zone = 38, menu_id = 119,  index = 688, npc = 16933552, offset = 6, x = 576,z = 0, y = -428.00003051758,  h = 223, unknown1 = 42, unknown2 = 1},
 	   SE3 = {display_name = 'Southeast 3', zone = 38, menu_id = 120,  index = 689, npc = 16933553, offset = 7, x = 428.00003051758,  z = 0, y = -385.00003051758,  h = 159, unknown1 = 43, unknown2 = 1},
 	   SE4 = {display_name = 'Southeast 4', zone = 38, menu_id = 121,  index = 690, npc = 16933554, offset = 8, x = 176.00001525879,  z = 0, y = -628,h = 223, unknown1 = 44, unknown2 = 1},
+	   CN = {display_name = 'Apollyon CN',  zone = 38, menu_id = 123,  index = 691, npc = 16933555, offset = 8, x = 0,  z = 0, y = 196.00001525879,h = 63, unknown1 = 51, unknown2 = 1},
         },
     ['temenos'] ={
        E  = {display_name = 'Entrance' ,        zone = 37, menu_id = 1000, index = 795, npc = 16929563, offset = 1, x = 580, z = 0 ,  y = 86.000007629395,   h = 63,  unknown1 = 1 , unknown2 = 1},
@@ -60,7 +61,8 @@ local npc_names = T{
 	   C1 = {display_name = 'Central Tower 1',  zone = 37, menu_id = 1022, index = 874, npc = 16929642, offset = 5, x = 580, z = -2.3800001144409, y = -544, h = 191, unknown1 = 41, unknown2 = 1},
 	   C2 = {display_name = 'Central Tower 2',  zone = 37, menu_id = 1023, index = 875, npc = 16929643, offset = 6, x = 260, z = -162.38000488281, y = -504.00003051758,  h = 191, unknown1 = 42, unknown2 = 1},
 	   C3 = {display_name = 'Central Tower 3',  zone = 37, menu_id = 1024, index = 876, npc = 16929644, offset = 7, x = 20,  z = -2.3800001144409, y = -544, h = 191, unknown1 = 43, unknown2 = 1},
-	   C4 = {display_name = 'Central Tower 4',  zone = 37, menu_id = 1025, index = 877, npc = 16929645, offset = 8, x = -296,z = -162.38000488281, y = -500.00003051758,  h = 127, unknown1 = 44, unknown2 = 1},    
+	   C4 = {display_name = 'Central Tower 4',  zone = 37, menu_id = 1025, index = 877, npc = 16929645, offset = 8, x = -296,z = -162.38000488281, y = -500.00003051758,  h = 127, unknown1 = 44, unknown2 = 1},
+	   CN = {display_name = 'Temenos CN',       zone = 37, menu_id = 1026, index = 878, npc = 16929646, offset = 8, x = -540,z = -2.3800001144409, y = -584,  h = 191, unknown1 = 51, unknown2 = 1},   
          }
 	}
 
@@ -276,11 +278,23 @@ return T {
 		local destination = nil
 		local cross_tower_checkinator = nil
 		local current_floor_checkinator = nil
+		local CN_check = nil
         if current_activity.sub_cmd == 'port' or current_activity.sub_cmd == 'next' or current_activity.sub_cmd == 'back' or current_activity.sub_cmd == 'random' then
             destination = nil
         else
             destination = current_activity.activity_settings
         end
+		--====== CN ======
+		if destination and (destination.menu_id == 123 or destination.menu_id == 1026) then
+			if menu_id ~= 102 and menu_id ~= 103 and menu_id ~= 1000 then
+				return "You must be at the entrance to warp there."
+			end
+			local unlockerator = p["Menu Parameters"] --and p["Menu Parameters"]:unpack('b8', 1)
+			CN_check = unlockerator and has_bit(unlockerator, 4)
+			if CN_check then
+				return "You cannot enter right now; CN is not open."
+			end
+		end
         --------------------------------------------------------------------------------------------------------------------------------------------
         --  Apollyon
         --------------------------------------------------------------------------------------------------------------------------------------------
@@ -292,7 +306,7 @@ return T {
 		end
 if zone == 38 then
         if not (current_activity.sub_cmd == 'enter' or current_activity.sub_cmd == 'exit') and
-        not (menu_id >= 102 and menu_id <= 121) then
+        not (menu_id >= 102 and menu_id <= 123) then
             return "Incorrect menu detected! Menu ID: " .. menu_id
         end
 		-------------------------------------------------------------------------------------------------------------------------------------------
@@ -348,7 +362,7 @@ if zone == 38 then
 				elseif menu_id == 111 then
 					destination = destination_array.apollyon.SW4
 				end
-			elseif menu_id >= 112 and menu_id <= 121 then
+			elseif menu_id >= 112 and menu_id <= 123 then
 				if menu_id == 112 then
 					destination = destination_array.apollyon.E1
 				elseif menu_id == 113 then
@@ -369,11 +383,15 @@ if zone == 38 then
 					destination = destination_array.apollyon.SE4
 				elseif menu_id == 121 then
 					destination = destination_array.apollyon.E1
+				elseif menu_id == 123 then
+					destination = destination_array.apollyon.E1
 				end
 			end
 		elseif current_activity.sub_cmd == 'back' then
-			if menu_id <= 121 and menu_id >= 113 then
-				if menu_id == 121 then
+			if menu_id <= 123 and menu_id >= 113 then
+				if menu_id == 123 then
+					destination = destination_array.apollyon.E1
+				elseif menu_id == 121 then
 					destination = destination_array.apollyon.SE3
 				elseif menu_id == 120 then
 					destination = destination_array.apollyon.SE2
@@ -456,8 +474,18 @@ if zone == 38 then
 				return 'Cannot warp to other towers from here.'
 			end
         end
-        --------------------------------------------------------------------------------------------------------------------------------------------
-    end    --  Temenos
+		---- CN Cross-tower prevention
+		if menu_id == 123 and destination.menu_id ~= 102 and destination.menu_id ~= 103 then
+			if cross_tower_checkinator then 
+				cross_tower_checkinator = nil
+				destination = destination_array.apollyon.E1
+			else
+				return 'Cannot warp to other towers from here.'
+			end
+		end
+    end 
+		--------------------------------------------------------------------------------------------------------------------------------------------   
+		 --  Temenos
         --------------------------------------------------------------------------------------------------------------------------------------------
 elseif zone == 37 then
 		-------------------------------------------------------------------------------------------------------------------------------------------
@@ -476,7 +504,7 @@ elseif zone == 37 then
 				if menu_id == destination.menu_id then
 					return "Open chest on this floor."
 				end
-			end 
+			end
 		elseif current_activity.sub_cmd == 'random' then
 			if _temenos_shuffle then
 				destination = destination_array.temenos[_temenos_shuffle]
@@ -531,7 +559,7 @@ elseif zone == 37 then
 				elseif menu_id == 1016 then
 					destination = destination_array.temenos.E3
 				end
-			elseif menu_id >= 1017 and menu_id <= 1025 then
+			elseif menu_id >= 1017 and menu_id <= 1026 then
 				if menu_id == 1017 then
 					destination = destination_array.temenos.E4
 				elseif menu_id == 1018 then
@@ -550,11 +578,15 @@ elseif zone == 37 then
 					destination = destination_array.temenos.C4
 				elseif menu_id == 1025 then
 					destination = destination_array.temenos.E
+				elseif menu_id == 1026 then
+					destination = destination_array.temenos.E
 				end
 			end
 		elseif current_activity.sub_cmd == 'back' then
-			if menu_id <= 1025 and menu_id >= 1017 then
-				if menu_id == 1025 then
+			if menu_id <= 1026 and menu_id >= 1017 then
+				if menu_id == 1026 then
+					destination = destination_array.temenos.E
+				elseif menu_id == 1025 then
 					destination = destination_array.temenos.C3
 				elseif menu_id == 1024 then
 					destination = destination_array.temenos.C2
@@ -615,7 +647,7 @@ elseif zone == 37 then
 		end
 -------------------------------------------
         if not
-        (menu_id >= 1000 and menu_id <= 1025) then
+        (menu_id >= 1000 and menu_id <= 1026) then
             return "Incorrect menu detected! Menu ID: " .. menu_id
         end
         -- prevent warping between towers / next command cross-tower destination entrance override
@@ -648,13 +680,22 @@ elseif zone == 37 then
         end
         ----------------Central Tower--------------------------------------------------------------------------
         if (menu_id >= 1022 and menu_id <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1022) then
-			if cross_tower_checkinator then 
+			if cross_tower_checkinator then
 				cross_tower_checkinator = nil
 				destination = destination_array.temenos.E
 			else
 				return 'Cannot warp to other towers from here.'
 			end
         end
+		----CN Cross-tower prevention----
+		if menu_id == 1026 and destination.menu_id ~= 1000 then
+			if cross_tower_checkinator then
+				cross_tower_checkinator = nil
+				destination = destination_array.temenos.E
+			else
+				return 'Cannot warp to other towers from here.'
+			end
+		end
 end
 	if current_activity.sub_cmd ~= 'exit' and current_activity.sub_cmd ~= 'enter' then
 		------------Same floor prevention / data check warp override------------------
@@ -679,7 +720,7 @@ end
 		return nil
     end,
     help_text = "| Limbus |\n Command options [li, te, ap]\n- li e1/nw1/sw2/ne5/se3   e/n1/w2/e5/c3 etc. -- warp to a designated tower and floor in limbus. \n- li next -- warp to the first uncompleted floor in sequence, if this is in another tower, will warp to the entrance.\n- li random -- Similar to the next command, sends you to floors you do not have the data for until you have collected all data; Will send you to other floors within the same tower until all are completed then will send to another tower/floor.\n- li port -- warp to the next floor of any tower, if on last floor will warp to the entrance, if at entrance will warp to first floor of the first tower. \n- li back -- the reverse of port command, teleports to the previous floor. If you are on the first floor of a tower this will send you to the entrance, if you are at the entrance this command will send you to the last floor of the last tower.\n- li enter -- enter apollyon. \n- li exit -- exit apollyon.\n------------------------------",
-    sub_zone_targets = S {'e1', 'e2', 'nw1', 'nw2', 'nw3', 'nw4', 'nw5', 'sw1', 'sw2', 'sw3','sw4', 'ne1', 'ne2', 'ne3', 'ne4', 'ne5', 'se1', 'se2', 'se3', 'se4','entrance','n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'w1', 'w2','w3', 'w4', 'w5', 'w6', 'w7', 'e1', 'e2', 'e3', 'e4', 'e5','e6','e7','c1','c2','c3','c4'}, 
+    sub_zone_targets = S {'e1', 'e2', 'nw1', 'nw2', 'nw3', 'nw4', 'nw5', 'sw1', 'sw2', 'sw3','sw4', 'ne1', 'ne2', 'ne3', 'ne4', 'ne5', 'se1', 'se2', 'se3', 'se4','entrance','n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'w1', 'w2','w3', 'w4', 'w5', 'w6', 'w7', 'e1', 'e2', 'e3', 'e4', 'e5','e6','e7','c1','c2','c3','c4','cn'}, 
     auto_select_zone = function(zone)
         if zone == 38 then
             return 'apollyon'
@@ -692,15 +733,15 @@ end
         local packet = nil
         local menu = p["Menu ID"]
         local npc = current_activity.npc
-        local destination = current_activity.activity_settings		
-        -- update request
-        packet = packets.new('outgoing', 0x016)
-        packet["Target Index"] = windower.ffxi.get_player().index
-        actions:append(T {
-            packet = packet,
-            description = 'update request'
-        })
+        local destination = current_activity.activity_settings
 
+            -- update request
+            packet = packets.new('outgoing', 0x016)
+            packet["Target Index"] = windower.ffxi.get_player().index
+            actions:append(T {
+                packet = packet,
+                description = 'update request'
+            })
         -- menu change
         packet = packets.new('outgoing', 0x05B)
         packet["Target"] = npc.id
@@ -714,7 +755,7 @@ end
         packet["_unknown2"] = 0
         actions:append(T {
             packet = packet,
-            delay = 0.2,
+            delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),
             description = 'send options'
         })
 
@@ -753,7 +794,7 @@ end
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 1,
+            delay = 2.5,
             description = 'complete menu'
         })
 
@@ -788,7 +829,7 @@ sub_commands = {
 				elseif menu == 111 then
 					destination = destination_array.apollyon.SW4
 				end
-			elseif menu >= 112 and menu <= 121 then
+			elseif menu >= 112 and menu <= 123 then
 				if menu == 112 then
 					destination = destination_array.apollyon.E1
 				elseif menu == 113 then
@@ -808,6 +849,8 @@ sub_commands = {
 				elseif menu == 120 then
 					destination = destination_array.apollyon.SE4
 				elseif menu == 121 then
+					destination = destination_array.apollyon.E1
+				elseif menu == 123 then
 					destination = destination_array.apollyon.E1
 				end
 			end
@@ -854,7 +897,7 @@ sub_commands = {
 				elseif menu == 1017 then
 					destination = destination_array.temenos.E4
 				end
-			elseif menu >= 1018 and menu <= 1025 then
+			elseif menu >= 1018 and menu <= 1026 then
 				if menu == 1018 then
 					destination = destination_array.temenos.E5
 				elseif menu == 1019 then
@@ -871,11 +914,12 @@ sub_commands = {
 					destination = destination_array.temenos.C4
 				elseif menu == 1025 then
 					destination = destination_array.temenos.E
+				elseif menu == 1026 then
+					destination = destination_array.temenos.E
 				end
 			end
 		end
     end
-	
 				if zone ~= destination.zone then
 					log('Woa woa woa.')
 					return
@@ -904,7 +948,7 @@ sub_commands = {
             packet["_unknown2"] = 0
             actions:append(T {
                 packet = packet,
-                delay = 0.2,
+				delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation) ,
                 description = 'send options'
             })
 
@@ -944,7 +988,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 1,
+            delay = 2.5,
             description = 'complete menu'
             })
             return actions
@@ -958,8 +1002,10 @@ sub_commands = {
 		local destination = nil
     if zone == 38 then
 		if current_activity.sub_cmd == 'back' then
-			if menu <= 121 and menu >= 113 then
-				if menu == 121 then
+			if menu <= 123 and menu >= 113 then
+				if menu == 123 then
+					destination = destination_array.apollyon.E1
+				elseif menu == 121 then
 					destination = destination_array.apollyon.SE3
 				elseif menu == 120 then
 					destination = destination_array.apollyon.SE2
@@ -1004,8 +1050,10 @@ sub_commands = {
 		end
     elseif zone == 37 then
 		if current_activity.sub_cmd == 'back' then
-			if menu <= 1025 and menu >= 1017 then
-				if menu == 1025 then
+			if menu <= 1026 and menu >= 1017 then
+				if menu == 1026 then
+					destination = destination_array.temenos.E
+				elseif menu == 1025 then
 					destination = destination_array.temenos.C3
 				elseif menu == 1024 then
 					destination = destination_array.temenos.C2
@@ -1094,7 +1142,7 @@ sub_commands = {
             packet["_unknown2"] = 0
             actions:append(T {
                 packet = packet,
-                delay = 0.2,
+                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation) ,
                 description = 'send options'
             })
 
@@ -1134,7 +1182,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 1,
+            delay = 2.5,
             description = 'complete menu'
             })
             return actions
@@ -1173,6 +1221,8 @@ sub_commands = {
         ----------------Central Tower--------------------------------------------------------------------------
         elseif (menu >= 118 and menu <= 121) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 121 or destination.menu_id < 118) then
 				destination = destination_array.apollyon.E1
+		elseif menu == 123 then
+			destination = destination_array.apollyon.E1 -- If we're in CN we only go to entrance.
         end
     elseif zone == 37 then
 			if _temenos_floor then
@@ -1197,6 +1247,8 @@ sub_commands = {
         ----------------Central Tower--------------------------------------------------------------------------
         elseif (menu >= 1022 and menu <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1022) then
 				destination = destination_array.temenos.E
+		elseif menu == 1026 then -- If we're in CN we only go to entrance.
+			destination = destination_array.temenos.E
         end
     end
 				if zone ~= destination.zone then
@@ -1230,7 +1282,7 @@ sub_commands = {
             packet["_unknown2"] = 0
             actions:append(T {
                 packet = packet,
-                delay = 0.2,
+                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation) ,
                 description = 'send options'
             })
 
@@ -1270,7 +1322,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 1,
+            delay = 2.5,
             description = 'complete menu'
             })
             return actions
@@ -1310,6 +1362,8 @@ sub_commands = {
         ----------------Central Tower--------------------------------------------------------------------------
         elseif (menu >= 118 and menu <= 121) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 121 or destination.menu_id < 118) then
 				destination = destination_array.apollyon.E1
+		elseif menu == 123 then
+			destination = destination_array.apollyon.E1 -- If we're in CN we only go to entrance.
         end
     elseif zone == 37 then
 			if _temenos_shuffle then
@@ -1334,6 +1388,8 @@ sub_commands = {
         ----------------Central Tower--------------------------------------------------------------------------
         elseif (menu >= 1022 and menu <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1022) then
 				destination = destination_array.temenos.E
+		elseif menu == 1026 then -- If we're in CN we only go to entrance.
+			destination = destination_array.temenos.E
         end
 		if menu == destination.menu_id then
 				destination = destination_array.temenos.E
@@ -1371,7 +1427,7 @@ sub_commands = {
             packet["_unknown2"] = 0
             actions:append(T {
                 packet = packet,
-                delay = 0.2,
+                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation) ,
                 description = 'send options'
             })
 
@@ -1411,7 +1467,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 1,
+            delay = 2.5,
             description = 'complete menu'
             })
             return actions
@@ -1448,7 +1504,7 @@ sub_commands = {
             packet["_unknown2"] = 0
             packet["Zone"] = zone
             packet["Menu ID"] = menu
-            actions:append(T{packet=packet, wait_packet=0x052, expecting_zone=true, delay=1+wiggle_value(settings.simulated_response_time, settings.simulated_response_variation), description='complete menu'})
+            actions:append(T{packet=packet, wait_packet=0x052, expecting_zone=true, delay = 1 + wiggle_value(settings.simulated_response_time, settings.simulated_response_variation), description='complete menu'})
 
             return actions
         end,
@@ -1485,7 +1541,7 @@ sub_commands = {
             packet["_unknown2"] = 0
             packet["Zone"] = zone
             packet["Menu ID"] = menu
-            actions:append(T{packet=packet, wait_packet=0x052, expecting_zone=true, delay=1+wiggle_value(settings.simulated_response_time, settings.simulated_response_variation), description='complete menu'})
+            actions:append(T{packet=packet, wait_packet=0x052, expecting_zone=true, delay = 1 +  wiggle_value(settings.simulated_response_time, settings.simulated_response_variation), description='complete menu'})
 
             return actions
         end,
@@ -1493,8 +1549,8 @@ sub_commands = {
     warpdata = T{
         ['Apollyon'] = T{
 			   ['Entrance']  = { shortcut = 'E1' },
-               ['E1'] = {display_name = 'Entrance 1', zone = 38,  menu_id = 102, index = 671, npc = 16933535, offset = 1, x = -608,z = 0, y = -600,h = 126, unknown1 = 1,unknown2 = 1},
-			   ['E2'] = {display_name = 'Entrance 2', zone = 38, menu_id = 103, index = 672, npc = 16933536, offset = 1, x = 608, z = 0, y = -600,h = 0,unknown1 = 1,  unknown2 = 1},
+               ['E1'] = {display_name = 'Entrance 1',   zone = 38, menu_id = 102, index = 671, npc = 16933535, offset = 1, x = -608,z = 0, y = -600,h = 126, unknown1 = 1,unknown2 = 1},
+			   ['E2'] = {display_name = 'Entrance 2',   zone = 38, menu_id = 103, index = 672, npc = 16933536, offset = 1, x = 608, z = 0, y = -600,h = 0,unknown1 = 1,  unknown2 = 1},
 			   ['NW1'] = {display_name = 'Northwest 1', zone = 38, menu_id = 104, index = 673, npc = 16933537, offset = 1, x = -440.00003051758, z = 0, y = -88.000007629395, h = 191, unknown1 = 11, unknown2 = 1},
 			   ['NW2'] = {display_name = 'Northwest 2', zone = 38, menu_id = 105, index = 674, npc = 16933538, offset = 2, x = -534,z = 0, y = 171.00001525879,h = 159, unknown1 = 12, unknown2 = 1},
 			   ['NW3'] = {display_name = 'Northwest 3', zone = 38, menu_id = 106, index = 675, npc = 16933540, offset = 3, x = -294,z = 0, y = 171.00001525879,h = 159, unknown1 = 13, unknown2 = 1},
@@ -1513,9 +1569,10 @@ sub_commands = {
 			   ['SE2'] = {display_name = 'Southeast 2', zone = 38, menu_id = 119, index = 688, npc = 16933552, offset = 6, x = 576,z = 0, y = -428.00003051758, h = 223, unknown1 = 42, unknown2 = 1},
 			   ['SE3'] = {display_name = 'Southeast 3', zone = 38, menu_id = 120, index = 689, npc = 16933553, offset = 7, x = 428.00003051758,  z = 0, y = -385.00003051758, h = 159, unknown1 = 43, unknown2 = 1},
 			   ['SE4'] = {display_name = 'Southeast 4', zone = 38, menu_id = 121, index = 690, npc = 16933554, offset = 8, x = 176.00001525879,  z = 0, y = -628,h = 223, unknown1 = 44, unknown2 = 1},
+			   ['CN'] = {display_name = 'Apollyon CN',  zone = 38, menu_id = 123, index = 691, npc = 16933555, offset = 8, x = 0,  z = 0, y = 196.00001525879,h = 63, unknown1 = 51, unknown2 = 1},
 		},
         ['Temenos'] = T{  
-			   ['Entrance']  = {display_name = 'Entrance' , zone = 37,  menu_id = 1000, index = 795, npc = 16929563, offset = 1, x = 580, z = 0 ,y = 86.000007629395,h = 63,unknown1 = 1 , unknown2 = 1},
+			   ['Entrance']  = {display_name = 'Entrance' , zone = 37, menu_id = 1000, index = 795, npc = 16929563, offset = 1, x = 580, z = 0 ,y = 86.000007629395,h = 63,unknown1 = 1 , unknown2 = 1},
 			   ['N1'] = {display_name = 'Northern Tower 1', zone = 37, menu_id = 1001, index = 853, npc = 16929621, offset = 1, x = 380.00003051758,z = 71.620002746582 ,y = 376.00003051758,h = 191,unknown1 = 11,unknown2 = 1},
 			   ['N2'] = {display_name = 'Northern Tower 2', zone = 37, menu_id = 1002, index = 854, npc = 16929622, offset = 2, x = 180.00001525879,z = -82.380004882812,y = 376.00003051758,h = 191,unknown1 = 12,unknown2 = 1},
 			   ['N3'] = {display_name = 'Northern Tower 3', zone = 37, menu_id = 1003, index = 855, npc = 16929623, offset = 3, x = 60.000003814697,z = 71.620002746582 ,y = 376.00003051758,h = 191,unknown1 = 13,unknown2 = 1},
@@ -1541,6 +1598,7 @@ sub_commands = {
 			   ['C2'] = {display_name = 'Central Tower 2',  zone = 37, menu_id = 1023, index = 875, npc = 16929643, offset = 6, x = 260, z = -162.38000488281, y = -504.00003051758,h = 191, unknown1 = 42, unknown2 = 1},
 			   ['C3'] = {display_name = 'Central Tower 3',  zone = 37, menu_id = 1024, index = 876, npc = 16929644, offset = 7, x = 20,  z = -2.3800001144409, y = -544, h = 191, unknown1 = 43, unknown2 = 1},
 			   ['C4'] = {display_name = 'Central Tower 4',  zone = 37, menu_id = 1025, index = 877, npc = 16929645, offset = 8, x = -296,z = -162.38000488281, y = -500.00003051758,h = 127, unknown1 = 44, unknown2 = 1},
+			   ['CN'] = {display_name = 'Temenos CN',       zone = 37, menu_id = 1026, index = 878, npc = 16929645, offset = 8, x = -540,z = -2.3800001144409, y = -584,  h = 191, unknown1 = 51, unknown2 = 1},   
 		},
     },
 }
