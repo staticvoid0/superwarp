@@ -12,6 +12,8 @@ The //sw command prefix can now be used for all maps. It may still be used in th
 | //sw missing | Displays the destinations the user is missing from the warp system nearest you where applicable. |
 |(New!) //sw default / hpdefault | Toggles default homepoint destinations between Legacy and New. |
 |(New!) //sw display | Toggles sendall confirmation display. |
+|(New!) //sw chest (tower) / chest |  -- Manually updates chest tracking with the tower you input after the chest command. i.e. //sw chest nw or sw/ne/se/n/w/e/c; If no argument is provided after 'chest' it will display the next chest open location while in limbus. |
+|(New!) //sw chestsync / syncchest / sync | Instantly synchronizes all characters' Limbus chest tracking order with the character the command is executed from, ensuring all characters warp to the same destination. |
 | //sw cancel [all/party]  | Cancels the current in-progress warp.   |
 | //sw reset [all/party]  | Resets client menu lock. This should be exceedingly rare, but it's here in case it's needed.   |
 

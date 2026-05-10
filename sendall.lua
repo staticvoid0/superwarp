@@ -303,6 +303,16 @@ windower.register_event('ipc message', function(msg)
         if entry and name then
             entry.received[name] = true
         end
+    elseif cmd == 'sync_limbus_chests' then
+        local chestdata = args[1]
+        if chestdata then
+            local success, chest_table = pcall(function()
+                return loadstring('return '..chestdata)()
+            end)
+            if success and type(chest_table) == 'table' then
+                sync_chest_data(chest_table)
+            end
+        end
     elseif cmd == 'execute' then
         local warp_id = args[1]
         local target = args[2]

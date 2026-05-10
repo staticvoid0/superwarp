@@ -216,6 +216,33 @@ local function add_table_entry(zone, entry)
     config.save(settings)
 end
 
+local function set_chest_order(data)
+    data = data:lower()
+    local zone, tower
+    if data:find("nw", 1, true) then
+        zone, tower = "apollyon" , "NW5"
+    elseif data:find("sw", 1, true) then
+        zone, tower = "apollyon" , "SW4"
+    elseif data:find("ne", 1, true) then
+        zone, tower = "apollyon" , "NE5"
+    elseif data:find("se", 1, true) then
+        zone, tower = "apollyon" , "SE4"
+    elseif data:find("n", 1, true) then
+        zone, tower = "temenos" , "N7"
+    elseif data:find("w", 1, true) then
+        zone, tower = "temenos" , "W7"
+    elseif data:find("e", 1, true) then
+        zone, tower = "temenos" , "E7"
+    elseif data:find("c", 1, true) then
+        zone, tower = "temenos" , "C4"
+    else
+        log("Invalid argument, chest order tracking not updated.")
+        return
+    end
+    log("Chest tracking updated. "..tower.." stored as most recently opened chest in "..zone..".")
+    add_table_entry(zone, tower)
+end
+
 function log(msg)
     if settings.chat_log_use == 'log' or settings.debug then
         windower.add_to_chat(207, 'superwarp: '..msg)
@@ -755,7 +782,7 @@ local function handle_warp(warp, args, fast_retry, retries_remaining, current_su
         state.loop_count = retries_remaining
     end
     state.fast_retry = fast_retry
-
+    state.warp_interrupted = false
     -- make args safe to index
     if args:length() == 0 then
         -- no args provided; make an empty string so :lower() calls won't error
@@ -867,7 +894,6 @@ local function received_warp_command(cmd, args)
     else
         intended_npc = {}
         state.warp_confirmed = false
-        state.warp_interrupted = false
         state.current_sub_cmd = nil
         if not smartcmd then
             state.debug_stack = T{}
@@ -933,6 +959,14 @@ local function magic_map()
         distance = nil,
         npc = nil,
     }
+
+    local player = windower.ffxi.get_mob_by_target('me')
+    if not player then
+        return best
+    end
+
+    local px, py, pz = player.x, player.y, player.z
+
     local zone_check = windower.ffxi.get_info().zone
     local max_dist = 36
 
@@ -968,15 +1002,26 @@ local function magic_map()
                         local npc = windower.ffxi.get_mob_by_index(index)
 
                         if npc and npc.valid_target then
-                            if not best.distance or npc.distance < best.distance then
-                                best.map_name = last_cache.map_name
-                                best.interaction = interaction_type
-                                best.distance = npc.distance
-                                best.npc = npc
+                            local diff_vec = V{
+                                npc.x - px,
+                                npc.y - py,
+                                npc.z - pz
+                            }
+
+                            local true_distance = diff_vec:length()
+
+                            if true_distance < 25 then  --2D distance checks are squared, these are not.
+                                if not best.distance or npc.distance < best.distance then
+                                    best.map_name = last_cache.map_name
+                                    best.interaction = interaction_type
+                                    best.distance = npc.distance
+                                    best.npc = npc
+                                end
                             end
                         end
                     end
-                    -- if within 6 yalms our work is done
+
+                    -- if within range our work is done
                     if best.npc and best.distance and best.distance < max_dist then
                         last_cache.zone = zone_check
                         last_cache.map_name = best.map_name
@@ -987,8 +1032,8 @@ local function magic_map()
             end
         end
     end
-
-    --   full scan if cache doesn't do the trick
+    
+    -- full scan if cache doesn't do the trick
     for map_name, map in pairs(maps) do
         if map.zone_npc_list and map.npc_names then
             local warp_zones = not map.all_warp_zones
@@ -1002,19 +1047,29 @@ local function magic_map()
                         local npc = windower.ffxi.get_mob_by_index(index)
 
                         if npc and npc.valid_target then
-                            if not best.distance or npc.distance < best.distance then
-                                best.map_name = map_name
-                                best.interaction = interaction_type
-                                best.distance = npc.distance
-                                best.npc = npc
-                            end
+                            local diff_vec = V{
+                                npc.x - px,
+                                npc.y - py,
+                                npc.z - pz
+                            }
 
-                            -- if within 6 yalms our work is done
-                            if best.distance and best.distance < max_dist then
-                                last_cache.zone = zone_check
-                                last_cache.map_name = best.map_name
-                                last_cache.interaction = best.interaction
-                                return best
+                            local true_distance = diff_vec:length()
+
+                            if true_distance < 25 then --2D distance checks are squared, these are not.
+                                if not best.distance or npc.distance < best.distance then
+                                    best.map_name = map_name
+                                    best.interaction = interaction_type
+                                    best.distance = npc.distance
+                                    best.npc = npc
+                                end
+
+                                -- if within range our work is done
+                                if best.distance and best.distance < max_dist then
+                                    last_cache.zone = zone_check
+                                    last_cache.map_name = best.map_name
+                                    last_cache.interaction = best.interaction
+                                    return best
+                                end
                             end
                         end
                     end
@@ -1118,17 +1173,28 @@ windower.register_event('addon command', function(...)
             settings:save()
         end
     elseif cmd == 'chest' then
-        local zone_name = resources.zones[windower.ffxi.get_info().zone].name:lower()
-        if zone_name == 'apollyon' or zone_name == 'temenos' then
-            for k, v in pairs (settings.limbus_chests[zone_name]) do
-                if v == 4 then
-                    log("Open chest at "..k)
-                    break
-                end
-            end
+        if args[1] then
+            set_chest_order(args[1])
         else
-            log('You are not in limbus.')
+            local zone_name = resources.zones[windower.ffxi.get_info().zone].name:lower()
+            if zone_name == 'apollyon' or zone_name == 'temenos' then
+                for k, v in pairs (settings.limbus_chests[zone_name]) do
+                    if v == 4 then
+                        log("Open chest at "..k)
+                        break
+                    end
+                end
+            else
+                log('You are not in limbus.')
+            end
         end
+    elseif cmd and cmd:contains('sync') then
+        local chestdata = T(settings.limbus_chests):tovstring()
+        chestdata = chestdata:gsub('%s+', '')
+        windower.send_ipc_message(
+            'sync_limbus_chests '..chestdata
+        )
+        log('Sent limbus chest sync.')
     elseif cmd and cmd:contains('default') then
         if settings.hp_legacy_defaults then
             settings.hp_legacy_defaults = false
@@ -1162,7 +1228,7 @@ windower.register_event('addon command', function(...)
             local map = maps[key]
             windower.add_to_chat(207,map.help_text)
         end
-        windower.add_to_chat(207,'| superwarp |\nsw cancel -- Cancels pending warp command.\nsw reset -- Attempts to clear menu lock.\nsw chest -- Displays the next chest open location within limbus.\nsw hpdefaults -- Toggles homepoint default destinations between Legacy and New.\nsw display -- Toggles all / party warp display.\nsw missing -- Display destinations you are missing from the nearest warp system if applicable.\n-----------------------------')
+        windower.add_to_chat(207,'| superwarp |\nsw cancel -- Cancels pending warp command.\nsw reset -- Attempts to clear menu lock.\nsw sync -- Instantly synchronizes all characters Limbus chest tracking order with the character the command is executed from.\nsw chest (tower) / chest -- Manually updates chest tracking with the tower you input after the chest command. i.e. //sw chest se; If no argument is provided will display the next chest open location within limbus. i.e. //sw chest\nsw hpdefaults -- Toggles homepoint default destinations between Legacy and New.\nsw display -- Toggles all / party warp display.\nsw missing -- Display destinations you are missing from the nearest warp system if applicable.\n-----------------------------')
         windower.add_to_chat(207,'Use [all/a/@all/party/p] after the command prefix and before the destination to warp all characters or all party/alliance members. (//li p next)\nYou may still use [warp] if you learned to include it or still have macros written this way. (sw hp warp eastern adoulin 1) (Legacy support)\n\n[New!] You may now use "//sw" or "/console sw" for all maps with no extra command prefix. i.e. //sw port , or //sw rab to go to Rabao #2')
         windower.add_to_chat(207,'[New!] superwarp (smartcommand) - You may now use just //sw with no command for all warps that do not require a destination to be specified. i.e. enter and exit commands for abyssea, escha zones and apollyon, domain invasion enter, next command in limbus, port in odyssey and sortie, runic portal assault and return, campaign npcs return and Cavernous Maw port, all 4 Walk Of Echoes commands. It can also be used to go to the default destination in cases that call for specification. "//sw p" to use the smart command with all party members, or "a" for all. Use with confidence. Layers of failsafes are in place.')
     elseif current_activity ~= nil then
@@ -1230,6 +1296,12 @@ local function auto_shutdown(id) -- Ensure that if the same process ID is still 
         current_activity = nil
         reset(true)
     end
+end
+
+function sync_chest_data(chestdata)
+    settings.limbus_chests = chestdata
+    config.save(settings)
+    log('Limbus chest data synced.')
 end
 
 local function read_warp_state(i,id)
