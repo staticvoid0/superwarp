@@ -45,7 +45,7 @@ _addon.name = 'superwarp'
 
 _addon.author = 'Akaden'
 
-_addon.version = '1.1.1'
+_addon.version = '1.1.1+'
 
 _addon.commands = {'sw','superwarp'}
 
@@ -109,10 +109,10 @@ local defaults = {
     hp_legacy_defaults = true,
     limbus_chests = {
         temenos = {
-            ["N7"] = 2,["W7"] = 3,["E7"] = 4,["C4"] = 1
+            ["N7"] = 4,["W7"] = 3,["E7"] = 2,["C4"] = 1
     },
         apollyon = {
-            ["NW5"] = 1,["SW4"] = 2,["NE5"] = 3,["SE4"] = 4
+            ["NW5"] = 4,["SW4"] = 3,["NE5"] = 2,["SE4"] = 1
         },
     }
 }
@@ -181,6 +181,7 @@ local state = {
 }
 
 local prev_location = nil
+local confirm_msg = ''
 local function add_table_entry(zone, entry)
     local t = settings.limbus_chests[zone]
     if not t or not t[entry] then
@@ -241,6 +242,12 @@ local function set_chest_order(data)
     end
     log("Chest tracking updated. "..tower.." stored as most recently opened chest in "..zone..".")
     add_table_entry(zone, tower)
+end
+
+function sync_chest_data(chestdata)
+    settings.limbus_chests = chestdata
+    config.save(settings)
+    log('Limbus chest data synced.')
 end
 
 function log(msg)
@@ -564,7 +571,7 @@ function release(menu_id)
 
 end
 
-local function reset(quiet)
+function reset(quiet)
 	client_lock()
     if last_npc ~= nil and last_menu ~= nil then
         general_release()
@@ -663,6 +670,13 @@ local function do_warp(map_name, zone, sub_zone)
             end
         elseif npc_key and (warp_settings.key == npc_key or npc_key == '1' and not warp_settings.key and warp_settings.npc == npc.index) and warp_settings.zone == windower.ffxi.get_info()['zone'] then
             log("You are already at "..display_name.."! Teleport canceled.")
+            local player = windower.ffxi.get_mob_by_target('me')
+            if player.name == warp_sender then
+                confirm_msg = 'All warps finished.'
+                warp_listener(true, player.name)
+            elseif current_warp_id then
+                windower.send_ipc_message('confirm '..current_warp_id..' '..player.name)
+            end
             state.loop_count = 0
         elseif npc.id and npc.index then
             current_activity = {type=map_name, npc=npc, activity_settings=warp_settings, zone=zone, sub_zone=sub_zone, warp_ident = warp_ident}
@@ -806,12 +820,13 @@ local function handle_warp(warp, args, fast_retry, retries_remaining, current_su
         end
         participants = order_participants(participants)
         debug('sending warp to all: '..participants:concat(', '))
+        confirm_msg = 'All warps confirmed.'
         send_all_with_confirm(
             warp..' '..args:concat(' '),
             settings.send_all_delay,
             participants,
             function(warp_id, entry)
-                log('All warps confirmed.')
+                log(confirm_msg)
             end,
             settings.send_all_display
         )
@@ -915,7 +930,11 @@ local function smart_command(best, short_name)
             best.interaction = 'next'
         end
     elseif best.map_name == 'limbus' and best.interaction ~= 'exit' then
-        best.interaction = 'next'
+        if zone_check == 33 then
+            best.interaction = 'enter'
+        else
+            best.interaction = 'next'
+        end
     elseif best.map_name == 'sortie' then
         if best.npc.name:find('Device', 1, true) then
             best.interaction = 'warp'
@@ -1092,9 +1111,7 @@ end
 local function the_superwarp(genArgs, dispatcher, retries)
 
     if retries == nil then
-        state.loop_count = 4
-    else
-        state.loop_count = retries
+        state.loop_count = settings.max_retries
     end
 
     local result = magic_map()
@@ -1147,15 +1164,23 @@ windower.register_event('addon command', function(...)
         warp_listener()
         received_warp_command(cmd, args)
     elseif cmd == 'cancel' or cmd == 'reset' then
-        reset()
-        if args[1] and args[1]:lower() == 'all' then
-            windower.send_ipc_message('reset')
-        end
-
-    elseif cmd == 'reset' then
-        reset()    
-        if args[1] and args[1]:lower() == 'all' then
-            windower.send_ipc_message('reset')
+        if args[1] then
+            local all = S{'all','a','@all'}:contains(args[1]:lower())
+            local party = S{'party','p','@party'}:contains(args[1]:lower())
+            if all or party then 
+                local participants = nil
+                participants = get_participants()
+                if party then
+                    participants = get_party_members(participants)
+                end
+                participants = order_participants(participants)
+                reset_all(settings.send_all_delay, participants)
+                warp_listener()
+            else
+                reset()
+            end
+        else
+            reset()
         end
     elseif cmd == 'debug' then
         settings.debug = not settings.debug
@@ -1298,12 +1323,6 @@ local function auto_shutdown(id) -- Ensure that if the same process ID is still 
     end
 end
 
-function sync_chest_data(chestdata)
-    settings.limbus_chests = chestdata
-    config.save(settings)
-    log('Limbus chest data synced.')
-end
-
 local function read_warp_state(i,id)
     if current_activity and id ~= current_activity.warp_ident then
         debug("A different warp has commenced now, leaving it to its own devices.")
@@ -1359,10 +1378,7 @@ local function limbus_state_reader(executor)
         movement_confirm:schedule(8, false, limbus_warp_retainer)
     else
         local phase = current_activity.action_index
-        if phase == 1 then
-            state.warp_interrupted = false
-            return false
-        elseif not phase == 4 then -- Early exit for 2 and 3
+        if not phase == 4 then -- Early exit for 1 2 and 3
             return false
         elseif phase == 4 then
             if not movement_confirm(true) then
@@ -1644,6 +1660,15 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             if map.validate then validation_message = map.validate(p["Menu ID"], zone, current_activity, p, settings) end
             if validation_message ~= nil then
                 log("WARNING: "..validation_message.." Canceling action.")
+                ------------------Warp Confirm----------------------
+                local player = windower.ffxi.get_mob_by_target('me')
+                if player.name == warp_sender then
+                    confirm_msg = 'All warps finished.'
+                    warp_listener(true, player.name)
+                elseif current_warp_id then
+                    windower.send_ipc_message('confirm '..current_warp_id..' '..player.name)
+                end
+                ---------------------------------------------
                 last_activity = current_activity
                 state.loop_count = 0
                 current_activity = nil

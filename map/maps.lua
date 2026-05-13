@@ -9,6 +9,7 @@ local maps =  {
     ['portals'] = require('map/portals'),
     ['voidwatch'] = require('map/voidwatch'),
     ['spd'] = require('map/spd'),
+    ['garden'] = require('map/garden'),
     ['sortie'] = require('map/sortie'),
     ['odyssey'] = require('map/odyssey'),
     ['limbus'] = require('map/limbus'),

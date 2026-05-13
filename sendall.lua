@@ -14,7 +14,7 @@ local status_box = texts.new({
             padding = 1
         }
 },
-    bg = {alpha = 190, red = 0, green = 65, blue = 90},
+    bg = {alpha = 190, red = 0, green = 75, blue = 95},
     flags = {right = false, bottom = false},
 })
 status_box:hide()
@@ -64,31 +64,6 @@ local function get_missing_players(entry)
         end
     end
     return missing
-end
-
--- =========================
--- Send All
--- =========================
-function send_all(msg, delay, participants)
-    if participants == nil then
-        participants = get_participants()
-    end
-
-    local total_delay = 0
-    local me = get_player_name()
-
-    for _,c in ipairs(participants) do
-        if c == me then
-            receive_send_all:schedule(total_delay, msg)
-        else
-            exec:schedule(total_delay, c, msg)
-        end
-        total_delay = total_delay + delay
-    end
-end
-
-function receive_send_all(msg)
-    print('receive_send_all not overridden! msg: '..msg)
 end
 
 -- =========================
@@ -169,6 +144,49 @@ function get_participants()
     return result
 end
 
+function receive_send_all(msg)
+    print('receive_send_all not overridden! msg: '..msg)
+end
+
+-- =========================
+-- Send All
+-- =========================
+function reset_all(delay, participants)
+    if participants == nil then
+        participants = get_participants()
+    end
+
+    local total_delay = 0
+    local me = get_player_name()
+
+    for _,c in ipairs(participants) do
+        if c == me then
+            reset:schedule(total_delay)
+        else
+            windower.send_ipc_message('reset '..c..' '..total_delay)
+        end
+        total_delay = total_delay + delay
+    end
+end
+
+function send_all(msg, delay, participants)
+    if participants == nil then
+        participants = get_participants()
+    end
+
+    local total_delay = 0
+    local me = get_player_name()
+
+    for _,c in ipairs(participants) do
+        if c == me then
+            receive_send_all:schedule(total_delay, msg)
+        else
+            exec:schedule(total_delay, c, msg)
+        end
+        total_delay = total_delay + delay
+    end
+end
+
 function send_all_with_confirm(msg, delay, participants, on_complete, readout)
     if participants == nil then
         participants = get_participants()
@@ -202,7 +220,7 @@ function send_all_with_confirm(msg, delay, participants, on_complete, readout)
 
     -- start completion watcher
     coroutine.schedule(function()
-        local timeoutinator = os.clock() + 15
+        local timeoutinator = os.clock() + 16
         local complete = true
         while pending_confirms[warp_id] and active_warp_id == warp_id and os.clock() < timeoutinator do
             local entry = pending_confirms[warp_id]
@@ -240,13 +258,16 @@ function send_all_with_confirm(msg, delay, participants, on_complete, readout)
                 active_warp_id = nil
                 break
             end
-            coroutine.sleep(0.05)
+            coroutine.sleep(0.1)
         end
         if not complete then
             local message = table.concat(get_missing_players(pending_confirms[warp_id]), ', ')
-            log('Failed to warp '..message)
+            if #message < 1 then
+                log('Failed to warp.')
+            else
+                log('Failed to warp '..message)
+            end
         end
-        
         status_box:hide()
         pending_confirms = {}
         active_warp_id = nil
@@ -324,6 +345,12 @@ windower.register_event('ipc message', function(msg)
             current_warp_id = warp_id
             -- execute command
             receive_send_all(msg)
+        end
+    elseif cmd == 'reset' then
+        local target = args[1]
+        local delayer = args[2]
+        if player and target == player then
+            reset:schedule(delayer)
         end
     end
 end)

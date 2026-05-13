@@ -143,6 +143,11 @@ The //sw command prefix can now be used for all maps. It may still be used in th
 |//[sw] woe [all/party] exit | Exit a battlefield inside Walk Of Echoes. "all" and "party" will send an ipc message to all local instances (or specific local party members) with a delay (otherwise it will get stuck).
 |alt cmd: we |
 
+#### Mog Garden (New!)
+| Command | Action |
+| --- | --- |
+|//[sw] mg [all/party] zone | Enter Mog Garden from Eastern/Western Adoulin or Mog Dinghy in a Port zone or exit Mog Garden from Mog Dinghy. "all" and "party" will send an ipc message to all local instances (or specific local party members) with a delay (otherwise it will get stuck).
+
 ### Fuzzy Zone Names
 
 Spaces and punctuation are ignored. So type "southernsand" all you want, buddy. You're going to Southern San d'oria. Also, if you ommit the homepoint/waypoint number, it'll just take the first one in the map. Favorites are available in the settings file (example follows):
@@ -216,7 +221,7 @@ Thanks to Lili for researching a better fuzzy matching logic.
 Thanks to Staticvoid for researching and implementing the Sortie, Odyssey, Temenos, Apollyon and Campaign warp systems.
 
 ### Updates
-#### v0.96
+#### v0.96.0
 - **Feature**: Homepoints now uses same-zone teleporting feature.
 - **Feature**: Homepoints now check enabled expansion content before warping. Before, if you warped to a zone that came in an expansion that is not enabled or installed, the character would get stuck until the expansion was enabled and installed.
 - **Feature**: All warp systems check the currency required to teleport before teleporting. 
@@ -329,10 +334,13 @@ Thanks to Staticvoid for researching and implementing the Sortie, Odyssey, Temen
 - **Resolved**: An issue that could cause the user to freeze or crash when touching a warp device, accidentally or otherwise, while superwarp was active.
 - **Resolved**: Minor bugs.
 
-#### v1.1.1
+#### v1.1.1+ (Post-Release Additions)
 - **Feature**: Waypoints now accept partially typed destination names for all locations, not just the zone names. Go ahead and type //sw mumm  to go to Mummers' Coalition  or //sw pion  to go to Pioneers' Coalition etc. superwarp will now know what you meant :D
+- **Feature**: Mog Garden added! (//mg zone) when near the Mog Garden entrance NPC in Eastern or Western Adoulin or a Mog Dinghy in a port zone; Exit your Mog Garden with the same command near the Mog Dinghy inside. (//sw in place of //mg zone )
 - **Feature**: A command has been added to toggle the default homepoint for popular zones between 'Legacy' and 'New', //sw default.
 - **Feature**: A command has been added to toggle the display of all / party warp progress, //sw display.
+- **Feature**: A command has been added to instantly synchronize the chest tracking data of all characters with the character the command is sent from, ensuring all characters warp to the same location with the 'next' and 'random' commands within Limbus. //sw sync
+- **Feature**: A command has been added to manually set the order of your chest tracking, or if no argument is provided after //sw chest   it will display the next chest to be opened while within Limbus. //sw chest (tower) i.e. //sw chest nw  or  //sw chest c
 - **Feature**: A small translucent box has been added that shows the progress of 'all' or 'party' warps in addition to chatlog messages that report the results. (Only applies to 'all' or 'party' warps.) The box vanishes after 15 seconds or upon confirming all warps.
 - **Improvement**: Sortie warp object unlock checks are no longer delayed on account of dependence on inventory loading for temp item check, but instead are done instantly upon interacting with them.
 - **Improvement**: CN destinations added to Limbus map with appropriate open checks.
