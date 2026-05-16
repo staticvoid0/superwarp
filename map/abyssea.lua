@@ -32,7 +32,7 @@ return T{
     validate = function(menu_id, zone, current_activity, p)
         local destination = current_activity.activity_settings
         local npcindex = p['NPC Index']
-        if current_activity.sub_cmd ~= 'exit' then
+        if current_activity.sub_cmd ~= 'exit' and current_activity.sub_cmd ~= 'enter' then
             if abyssea_zones:contains(zone) then
                 if npcindex == destination.npcindex then
                     return "You are already at that location."

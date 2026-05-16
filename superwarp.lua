@@ -929,6 +929,12 @@ local function smart_command(best, short_name)
         elseif best.map_name == 'limbus' and zone_check ~= 33 then
             best.interaction = 'next'
         end
+    elseif best.interaction == 'exit' then
+        if best.npc.name:find('Maw', 1, true) then
+            if maps.abyssea.entry_zones:contains(zone_check) then
+                best.interaction = 'enter'
+            end
+        end
     elseif best.map_name == 'limbus' and best.interaction ~= 'exit' then
         if zone_check == 33 then
             best.interaction = 'enter'
@@ -1098,6 +1104,12 @@ local function magic_map()
     end
 
     if best.map_name then
+        if best.map_name == 'campaign' and best.interaction == 'port' then
+            if maps.abyssea.target_ids:contains(best.npc.id) then
+                best.map_name = 'abyssea'
+                best.interaction = 'enter'
+            end
+        end
         last_cache.zone = zone_check
         last_cache.map_name = best.map_name
         last_cache.interaction = best.interaction
@@ -1127,7 +1139,6 @@ local function the_superwarp(genArgs, dispatcher, retries)
         return
     end
     state.debug_stack = T{}
-    debug('Using '..result.npc.name..' for '..result.map_name..'.')
     state.loop_count = nil
     local map = maps[result.map_name]
 
@@ -1142,9 +1153,11 @@ local function the_superwarp(genArgs, dispatcher, retries)
         local smart_cmd
         smart_cmd, short_name = smart_command(result, short_name)
         if smart_cmd ~= 'warp' and short_name ~= 'hp' then
-            debug('No sub-command provided, using '..smart_cmd..'.')
+            debug('No sub-command provided, using '..short_name..' '..smart_cmd..'.')
             genArgs:append(smart_cmd)
         end
+    else
+        debug('Using '..result.npc.name..' for '..result.map_name..'.')
     end
     if dispatcher then genArgs:insert(1, dispatcher) end
     smartcmd = true
@@ -1163,24 +1176,10 @@ windower.register_event('addon command', function(...)
     if cmd and warp_list:contains(cmd:lower()) and args[1] then
         warp_listener()
         received_warp_command(cmd, args)
-    elseif cmd == 'cancel' or cmd == 'reset' then
-        if args[1] then
-            local all = S{'all','a','@all'}:contains(args[1]:lower())
-            local party = S{'party','p','@party'}:contains(args[1]:lower())
-            if all or party then 
-                local participants = nil
-                participants = get_participants()
-                if party then
-                    participants = get_party_members(participants)
-                end
-                participants = order_participants(participants)
-                reset_all(settings.send_all_delay, participants)
-                warp_listener()
-            else
-                reset()
-            end
-        else
-            reset()
+    elseif cmd == 'reset' or cmd == 'cancel' then
+        reset()    
+        if args[1] and args[1]:lower() == 'all' then
+            windower.send_ipc_message('reset')
         end
     elseif cmd == 'debug' then
         settings.debug = not settings.debug
