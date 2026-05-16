@@ -1104,12 +1104,6 @@ local function magic_map()
     end
 
     if best.map_name then
-        if best.map_name == 'campaign' and best.interaction == 'port' then
-            if maps.abyssea.target_ids:contains(best.npc.id) then
-                best.map_name = 'abyssea'
-                best.interaction = 'enter'
-            end
-        end
         last_cache.zone = zone_check
         last_cache.map_name = best.map_name
         last_cache.interaction = best.interaction
@@ -1140,6 +1134,12 @@ local function the_superwarp(genArgs, dispatcher, retries)
     end
     state.debug_stack = T{}
     state.loop_count = nil
+    if result.map_name == 'campaign' and result.interaction == 'port' then
+        if maps.abyssea.target_ids:contains(result.npc.id) then
+            result.map_name = 'abyssea'
+            result.interaction = 'enter'
+        end
+    end
     local map = maps[result.map_name]
 
     local short_name
@@ -1176,10 +1176,24 @@ windower.register_event('addon command', function(...)
     if cmd and warp_list:contains(cmd:lower()) and args[1] then
         warp_listener()
         received_warp_command(cmd, args)
-    elseif cmd == 'reset' or cmd == 'cancel' then
-        reset()    
-        if args[1] and args[1]:lower() == 'all' then
-            windower.send_ipc_message('reset')
+    elseif cmd == 'cancel' or cmd == 'reset' then
+        if args[1] then
+            local all = S{'all','a','@all'}:contains(args[1]:lower())
+            local party = S{'party','p','@party'}:contains(args[1]:lower())
+            if all or party then 
+                local participants = nil
+                participants = get_participants()
+                if party then
+                    participants = get_party_members(participants)
+                end
+                participants = order_participants(participants)
+                reset_all(settings.send_all_delay, participants)
+                warp_listener()
+            else
+                reset()
+            end
+        else
+            reset()
         end
     elseif cmd == 'debug' then
         settings.debug = not settings.debug
@@ -1377,7 +1391,7 @@ local function limbus_state_reader(executor)
         movement_confirm:schedule(8, false, limbus_warp_retainer)
     else
         local phase = current_activity.action_index
-        if not phase == 4 then -- Early exit for 1 2 and 3
+        if phase ~= 4 then -- Early exit for 1 2 and 3
             return false
         elseif phase == 4 then
             if not movement_confirm(true) then

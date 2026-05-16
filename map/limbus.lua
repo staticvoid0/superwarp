@@ -1598,7 +1598,7 @@ sub_commands = {
 			   ['C2'] = {display_name = 'Central Tower 2',  zone = 37, menu_id = 1023, index = 875, npc = 16929643, offset = 6, x = 260, z = -162.38000488281, y = -504.00003051758,h = 191, unknown1 = 42, unknown2 = 1},
 			   ['C3'] = {display_name = 'Central Tower 3',  zone = 37, menu_id = 1024, index = 876, npc = 16929644, offset = 7, x = 20,  z = -2.3800001144409, y = -544, h = 191, unknown1 = 43, unknown2 = 1},
 			   ['C4'] = {display_name = 'Central Tower 4',  zone = 37, menu_id = 1025, index = 877, npc = 16929645, offset = 8, x = -296,z = -162.38000488281, y = -500.00003051758,h = 127, unknown1 = 44, unknown2 = 1},
-			   ['CN'] = {display_name = 'Temenos CN',       zone = 37, menu_id = 1026, index = 878, npc = 16929645, offset = 8, x = -540,z = -2.3800001144409, y = -584,  h = 191, unknown1 = 51, unknown2 = 1},   
+			   ['CN'] = {display_name = 'Temenos CN',       zone = 37, menu_id = 1026, index = 878, npc = 16929646, offset = 8, x = -540,z = -2.3800001144409, y = -584,  h = 191, unknown1 = 51, unknown2 = 1},   
 		},
     },
 }
