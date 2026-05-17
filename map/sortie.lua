@@ -9,11 +9,11 @@ local npc_names = T{
     repop = S{'Diaphanous Device','Diaphanous Bitzer'},
 }
 local destination_array = {
-        device_  = {display_name = 'Device' ,         menu_id = 1000, index = 817, zone = zone_tag,npc = 21001009, offset = 1, x = -836.00006103516, y = -20, z = -178.00001525879 , h = 0, unknown1 = 1 , unknown2 = 1},
-        device_a = {display_name = 'Device #A',       menu_id = 1001, index = 818, zone = zone_tag,npc = 21001010, offset = 2, x = -460.00003051758, y = 96.000007629395, z = -150 , h = 63, unknown1 = 2  , unknown2 = 1},
-        device_b = {display_name = 'Device #B',       menu_id = 1002, index = 819, zone = zone_tag,npc = 21001011, offset = 3, x = -344.00003051758, y = -20, z = -150 , h = 127, unknown1 = 3 , unknown2 = 1},
-        device_c = {display_name = 'Device #C',       menu_id = 1003, index = 820, zone = zone_tag,npc = 21001012, offset = 4, x = -460.00003051758, y = -136, z = -150 , h = 191, unknown1 = 4 , unknown2 = 1},
-        device_d = {display_name = 'Device #D',       menu_id = 1004, index = 821, zone = zone_tag,npc = 21001013, offset = 5, x = -576, y = -20, z = -150 , h = 0, unknown1 = 5, unknown2 = 1},
+        device_  = {display_name = 'Device' ,         menu_id = 1000, index = 817, zone = zone_tag,npc = 21001009, offset = 32, x = -836.00006103516, y = -20, z = -178.00001525879 , h = 0, unknown1 = 1 , unknown2 = 1},
+        device_a = {display_name = 'Device #A',       menu_id = 1001, index = 818, zone = zone_tag,npc = 21001010, offset = 33, x = -460.00003051758, y = 96.000007629395, z = -150 , h = 63, unknown1 = 2  , unknown2 = 1},
+        device_b = {display_name = 'Device #B',       menu_id = 1002, index = 819, zone = zone_tag,npc = 21001011, offset = 34, x = -344.00003051758, y = -20, z = -150 , h = 127, unknown1 = 3 , unknown2 = 1},
+        device_c = {display_name = 'Device #C',       menu_id = 1003, index = 820, zone = zone_tag,npc = 21001012, offset = 35, x = -460.00003051758, y = -136, z = -150 , h = 191, unknown1 = 4 , unknown2 = 1},
+        device_d = {display_name = 'Device #D',       menu_id = 1004, index = 821, zone = zone_tag,npc = 21001013, offset = 36, x = -576, y = -20, z = -150 , h = 0, unknown1 = 5, unknown2 = 1},
         gadget_a = {display_name = 'Gadget #A',       menu_id = 1005, index = 822, zone = zone_tag,npc = 21001014, offset = 1, x = -900.00006103516, y = 416.00003051758, z = -200.00001525879 , h = 63, unknown1 = 1, unknown2 = 1},
         gadget_b = {display_name = 'Gadget #B',       menu_id = 1006, index = 823, zone = zone_tag,npc = 21001015, offset = 2, x = -24.000001907349, y = 420.00003051758, z = -200.00001525879 , h = 127, unknown1 = 2, unknown2 = 1},
         gadget_c = {display_name = 'Gadget #C',       menu_id = 1007, index = 824, zone = zone_tag,npc = 21001016, offset = 3, x = -20, y = -456.00003051758, z = -200.00001525879 , h = 191, unknown1 = 3, unknown2 = 1},
@@ -163,15 +163,26 @@ return T {
             destination = nil
         else
             destination = current_activity.activity_settings
+            ---- Device unlocks -----
+            local unlock_bits = p["Menu Parameters"]
+            local destination_locked = true
+            if destination.offset ~= nil then
+                destination_locked = has_bit(unlock_bits, destination.offset)
+            end
+            if menu_id == destination.menu_id then
+                return "You're already at that location"
+            elseif destination_locked then
+                return "Cannot warp to "..destination.key.." without the Ra'Kaznar Plate #"..destination.key.." KI."
+            end
+            ------------------------
         end
 		if origination == nil or bitcheckinator == nil then
 			return 'Please update your superwarp.lua file to the latest version for Sortie support'
 		end
-		-------------------------------------------------------------------------------------------------------------------------------------------
        -- Destination setters
         --------------------------------------------------------------------------------------------------------------------------------------------
     if current_activity.sub_cmd ~= 'repop' then
-        if menu_id == 1010 then
+        if menu_id == 1010 then 
             destination = destination_array.bitzer_e
         elseif menu_id == 1011 then
             destination = destination_array.bitzer_f
@@ -266,80 +277,6 @@ return T {
             return 'Not in a Sortie zone!'
         end
         --------------------------------------------------------------------------------------------------------------------
-        ----   KI CHECKS. DO NOT JACK AROUND WITH THIS! IT WONT WORK ANYWAY: CONFIRMED. CHEERS ----
-
-        -- Bitzers --
-        if (menu_id >= 1010 and menu_id <= 1017) then
-            if menu_id == 1010 and not has_temp_item(temp_item_ids.Sheet.A) then
-                return 'You do not have the Ra\'Kaznar Sheet #A'
-            end
-            if menu_id == 1011 and not has_temp_item(temp_item_ids.Sheet.B) then
-                return 'You do not have the Ra\'Kaznar Sheet #B'
-            end
-            if menu_id == 1012 and not has_temp_item(temp_item_ids.Sheet.C) then
-                return 'You do not have the Ra\'Kaznar Sheet #C'
-            end
-            if menu_id == 1013 and not has_temp_item(temp_item_ids.Sheet.D) then
-                return 'You do not have the Ra\'Kaznar Sheet #D'
-            end
-
-        -- Gadgets --
-        elseif (menu_id >= 1005 and menu_id <= 1008) or (menu_id >= 1018 and menu_id <= 1021) then
-            if menu_id == 1005 and not has_temp_item(temp_item_ids.Shard.A) then
-                return 'You do not have the Ra\'Kaznar Shard #A'
-            end
-            if menu_id == 1006 and not has_temp_item(temp_item_ids.Shard.B) then
-                return 'You do not have the Ra\'Kaznar Shard #B'
-            end
-            if menu_id == 1007 and not has_temp_item(temp_item_ids.Shard.C) then
-                return 'You do not have the Ra\'Kaznar Shard #C'
-            end
-            if menu_id == 1008 and not has_temp_item(temp_item_ids.Shard.D) then
-                return 'You do not have the Ra\'Kaznar Shard #D'
-            end
-            if menu_id == 1018 and not has_temp_item(temp_item_ids.Shard.E) then
-                return 'You do not have the Ra\'Kaznar Shard #E'
-            end
-            if menu_id == 1019 and not has_temp_item(temp_item_ids.Shard.F) then
-                return 'You do not have the Ra\'Kaznar Shard #F'
-            end
-            if menu_id == 1020 and not has_temp_item(temp_item_ids.Shard.G) then
-                return 'You do not have the Ra\'Kaznar Shard #G'
-            end
-            if menu_id == 1021 and not has_temp_item(temp_item_ids.Shard.H) then
-                return 'You do not have the Ra\'Kaznar Shard #H'
-            end
-
-        -- Devices--
-        elseif (menu_id >= 1000 and menu_id <= 1004) then
-            if menu_id == 1000 and
-                (not has_temp_item(temp_item_ids.Plate.A) and not has_temp_item(temp_item_ids.Plate.B) and
-                    not has_temp_item(temp_item_ids.Plate.C) and not has_temp_item(temp_item_ids.Plate.D)) then
-                return 'You do not have any of the Ra\'Kaznar Plates'
-            end
-            if (menu_id >= 1000 and menu_id <= 1004) and destination.menu_id == 1001 and
-                not has_temp_item(temp_item_ids.Plate.A) then
-                return 'You do not have the Ra\'Kaznar Plate #A'
-            end
-            if (menu_id >= 1000 and menu_id <= 1004) and destination.menu_id == 1002 and
-                not has_temp_item(temp_item_ids.Plate.B) then
-                return 'You do not have the Ra\'Kaznar Plate #B'
-            end
-            if (menu_id >= 1000 and menu_id <= 1004) and destination.menu_id == 1003 and
-                not has_temp_item(temp_item_ids.Plate.C) then
-                return 'You do not have the Ra\'Kaznar Plate #C'
-            end
-            if (menu_id >= 1000 and menu_id <= 1004) and destination.menu_id == 1004 and
-                not has_temp_item(temp_item_ids.Plate.D) then
-                return 'You do not have the Ra\'Kaznar Plate #D'
-            end
-        end
-        -- Fragments--
-        if menu_id == 1022 and
-            (not has_temp_item(temp_item_ids.Fragment.A) or not has_temp_item(temp_item_ids.Fragment.B) or
-                not has_temp_item(temp_item_ids.Fragment.C) or not has_temp_item(temp_item_ids.Fragment.D)) then
-            return 'You do not have all 4 Ra\'Kaznar Fragments'
-        end
     end
         return nil
     end,
@@ -960,11 +897,11 @@ return T {
                 ['#B'] = { shortcut = 'B' },
                 ['#C'] = { shortcut = 'C' },
                 ['#D'] = { shortcut = 'D' },
-  --[[Device]]  ['S'] =   { menu_id = 1000, index = 817, zone = 275,npc = 21001009, offset = 1, x = -836.00006103516, y = -20, z = -178.00001525879 , h = 0, unknown1 = 1 , unknown2 = 1},
-  --[[Device A]]['A'] =   { menu_id = 1001, index = 818, zone = 275,npc = 21001010, offset = 2, x = -460.00003051758, y = 96.000007629395, z = -150 , h = 63, unknown1 = 2  , unknown2 = 1},
-  --[[Device B]]['B'] =   { menu_id = 1002, index = 819, zone = 275,npc = 21001011, offset = 3, x = -344.00003051758, y = -20, z = -150 , h = 127, unknown1 = 3 , unknown2 = 1},
-  --[[Device C]]['C'] =   { menu_id = 1003, index = 820, zone = 275,npc = 21001012, offset = 4, x = -460.00003051758, y = -136, z = -150 , h = 191, unknown1 = 4 , unknown2 = 1},
-  --[[Device D]]['D'] =   { menu_id = 1004, index = 821, zone = 275,npc = 21001013, offset = 5, x = -576, y = -20, z = -150 , h = 0, unknown1 = 5, unknown2 = 1}, 
+  --[[Device]]  ['S'] =   { menu_id = 1000, index = 817, zone = 275,npc = 21001009, offset = 32, x = -836.00006103516, y = -20, z = -178.00001525879 , h = 0, unknown1 = 1 , unknown2 = 1},
+  --[[Device A]]['A'] =   { menu_id = 1001, index = 818, zone = 275,npc = 21001010, offset = 33, x = -460.00003051758, y = 96.000007629395, z = -150 , h = 63, unknown1 = 2  , unknown2 = 1},
+  --[[Device B]]['B'] =   { menu_id = 1002, index = 819, zone = 275,npc = 21001011, offset = 34, x = -344.00003051758, y = -20, z = -150 , h = 127, unknown1 = 3 , unknown2 = 1},
+  --[[Device C]]['C'] =   { menu_id = 1003, index = 820, zone = 275,npc = 21001012, offset = 35, x = -460.00003051758, y = -136, z = -150 , h = 191, unknown1 = 4 , unknown2 = 1},
+  --[[Device D]]['D'] =   { menu_id = 1004, index = 821, zone = 275,npc = 21001013, offset = 36, x = -576, y = -20, z = -150 , h = 0, unknown1 = 5, unknown2 = 1}, 
 		},
         --[[
 		            ['Outer Ra\'Kaznar [U2]'] = T{
