@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         Sortie  support implementation: Staticvoid
         Odyssey support implementation: Staticvoid
         Apollyon  and  Temenos support: Staticvoid
+		Mog Garden support            : Staticvoid
+        Maintenance			          : Staticvoid
 ]]
 
 _addon.name = 'superwarp'
