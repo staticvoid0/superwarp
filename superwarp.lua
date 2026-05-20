@@ -1388,7 +1388,7 @@ end
 local function limbus_state_reader(executor)
     if executor then
         local limbus_warp_retainer = current_activity.action_queue[4]
-        movement_confirm:schedule(8, false, limbus_warp_retainer)
+        movement_confirm:schedule(6.5, false, limbus_warp_retainer)
     else
         local phase = current_activity.action_index
         if phase ~= 4 then -- Early exit for 1 2 and 3

@@ -794,7 +794,7 @@ end
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 1.5,
             description = 'complete menu'
         })
 
@@ -988,7 +988,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 1.5,
             description = 'complete menu'
             })
             return actions
@@ -1182,7 +1182,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 1.5,
             description = 'complete menu'
             })
             return actions
@@ -1322,7 +1322,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 1.5,
             description = 'complete menu'
             })
             return actions
@@ -1467,7 +1467,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 1.5,
             description = 'complete menu'
             })
             return actions
