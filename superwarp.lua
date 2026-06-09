@@ -1344,7 +1344,8 @@ local function read_warp_state(i,id)
         debug("Warp state has progressed, leaving it to its own devices.")
         return
     elseif not current_activity then
-        debug("No current activity, nothing needs reset.")
+        reset(true)
+        debug("No current activity, resetting for good measure.")
         return
     end
     auto_shutdown:schedule(5, id)
