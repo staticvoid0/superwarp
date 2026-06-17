@@ -353,3 +353,6 @@ Thanks to Staticvoid for researching and implementing the Sortie, Odyssey, Temen
 - **Resolved**: A bug that could occur due to interrupts / retries where the user could re-enter the basement in Sortie, each warp command and its retries are now invariably locked to a single NPC. Warps will now auto-cancel if a different NPC is detected after warping. Rest easy exiting Sortie basements even under heavy attack. :)
 - **Resolved**: A bug involving interrupt / retries wherein a warp's subcommand could get dropped, changing the warp to a stardard warp with a default destination - in the case of limbus this would result in (protected) attempt(s) to warp to W1 in Temenos or NE5 attempt(s) in Apollyon, which are in essence default destinations respectively.
 - **Resolved**: A bug where limbus chest tracking could become imperfect if the determined next chest was not opened.
+
+#### v1.1.2
+- **Resolved**: Limbus chest ids updated
