@@ -1344,8 +1344,8 @@ local function read_warp_state(i,id)
         debug("Warp state has progressed, leaving it to its own devices.")
         return
     elseif not current_activity then
-        reset(true)
-        debug("No current activity, resetting for good measure.")
+        log('If you become menu locked use //sw reset to clear.')
+        debug("No current activity, doing nothing.")
         return
     end
     auto_shutdown:schedule(5, id)
@@ -1389,7 +1389,7 @@ end
 local function limbus_state_reader(executor)
     if executor then
         local limbus_warp_retainer = current_activity.action_queue[4]
-        movement_confirm:schedule(6.5, false, limbus_warp_retainer)
+        movement_confirm:schedule(8, false, limbus_warp_retainer)
     else
         local phase = current_activity.action_index
         if phase ~= 4 then -- Early exit for 1 2 and 3
@@ -1713,7 +1713,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 current_activity = nil
                 return false
             end
-        elseif current_activity then
+        elseif current_activity and state.warp_interrupted then
             debug("Prevented menu from blocking packet exchanges, reading state machine...")
             local i = current_activity and current_activity.action_index
             local ident = current_activity.warp_ident -- Capture Warp ID now and check in 5 seconds to determine whether a reset is needed.
@@ -1760,18 +1760,18 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
         --debug("out 0x05C: "..t.name..", menu:"..tostring(p['Menu ID'])..", zone:"..tostring(p['Zone'])..", x:"..string.format('%0.3f', p['X'])..", z:"..string.format('%0.3f', p['Z'])..", y:"..string.format('%0.3f', p['Y'])..", _u1:"..tostring(p['_unknown1'])..", _u3:"..tostring(p['_unknown3']))
     elseif id == 0x05B and in_limbus_zone then  -- only look at these packets when we're in limbus
         local p = packets.parse('outgoing', data)
-        if p["Target"] >= 16929653 and p["Target"] <= 16929656 then
+        if p["Target"] >= 16929659 and p["Target"] <= 16929662 then
             if p['Automated Message'] == true then --Filter x2 calls and/or interrupts
                 if current_zone == 37 then
                     local zone = 'temenos'
                     local tower = nil
-                    if p["Target"] == 16929653 then
+                    if p["Target"] == 16929659 then
                         tower = "N7"
-                    elseif p["Target"] == 16929654 then
+                    elseif p["Target"] == 16929660 then
                         tower = "W7"
-                    elseif p["Target"] == 16929655 then
+                    elseif p["Target"] == 16929661 then
                         tower = "E7"
-                    elseif p["Target"] == 16929656 then
+                    elseif p["Target"] == 16929662 then
                         tower = "C4"
                     end
                     if tower then
@@ -1779,18 +1779,18 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
                     end
                 end
             end
-        elseif p["Target"] >= 16933556 and p["Target"] <= 16933559 then
+        elseif p["Target"] >= 16933563 and p["Target"] <= 16933566 then
             if p['Automated Message'] == true then --Filter x2 calls and/or interrupts
                 if current_zone == 38 then
                     local zone = 'apollyon'
                     local tower = nil
-                    if p["Target"] == 16933556 then
+                    if p["Target"] == 16933563 then
                         tower = "NW5"
-                    elseif p["Target"] == 16933557 then
+                    elseif p["Target"] == 16933564 then
                         tower = "SW4"
-                    elseif p["Target"] == 16933558 then
+                    elseif p["Target"] == 16933565 then
                         tower = "NE5"
-                    elseif p["Target"] == 16933559 then
+                    elseif p["Target"] == 16933566 then
                         tower = "SE4"
                     end
                     if tower then
