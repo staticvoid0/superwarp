@@ -45,7 +45,7 @@ _addon.name = 'superwarp'
 
 _addon.author = 'Akaden'
 
-_addon.version = '1.1.1+'
+_addon.version = '1.1.3'
 
 _addon.commands = {'sw','superwarp'}
 
@@ -87,7 +87,7 @@ sub_zone_aliases = {
 
 local defaults = {
     debug = false,
-    send_all_delay = 0.237,                 -- delay (seconds) between each character
+    send_all_delay = 0.3,                 -- delay (seconds) between each character
     max_retries = 6,                        -- max retries for loading NPCs.
     retry_delay = 2,                        -- delay (seconds) between retries
     simulated_response_time = 0,            -- response time (seconds) for selecting a single menu item. Note this can happen multiple times per warp.
@@ -109,12 +109,20 @@ local defaults = {
     hp_legacy_defaults = true,
     limbus_chests = {
         temenos = {
-            ["N7"] = 4,["W7"] = 3,["E7"] = 2,["C4"] = 1
+            ["N7"] = 1,["W7"] = 2,["E7"] = 3,["C4"] = 4
     },
         apollyon = {
-            ["NW5"] = 4,["SW4"] = 3,["NE5"] = 2,["SE4"] = 1
-        },
-    }
+            ["NW5"] = 1,["SW4"] = 2,["NE5"] = 3,["SE4"] = 4
+        }
+    },
+    limbus_chest_order = {
+        temenos = {
+            ["N4"] = 1,["W4"] = 2,["E4"] = 3,["C3"] = 4
+    },
+        apollyon = {
+            ["NW5"] = 1,["SW4"] = 2,["NE5"] = 3,["SE4"] = 4
+        }
+    },
 }
 local settings
 local player_info = windower.ffxi.get_info().logged_in and windower.ffxi.get_player().name
@@ -183,7 +191,7 @@ local state = {
 local prev_location = nil
 local confirm_msg = ''
 local function add_table_entry(zone, entry)
-    local t = settings.limbus_chests[zone]
+    local t = settings.limbus_chest_order[zone]
     if not t or not t[entry] then
         return
     end
@@ -217,6 +225,42 @@ local function add_table_entry(zone, entry)
     config.save(settings)
 end
 
+local function migrate_limbus_chest_order()
+    -- Already migrated
+    if settings.version == 2 then
+        return
+    end
+
+    local old = settings.limbus_chests or {}
+
+    settings.limbus_chest_order = {
+        apollyon = {},
+        temenos = {},
+    }
+    -- Preserve Apollyon order
+    if old.apollyon then
+        settings.limbus_chest_order.apollyon = {
+            ["NW5"] = old.apollyon.NW5 or 4,
+            ["SW4"] = old.apollyon.SW4 or 3,
+            ["NE5"] = old.apollyon.NE5 or 2,
+            ["SE4"] = old.apollyon.SE4 or 1,
+        }
+    end
+    -- Preserve Temenos order (old -> new floor names)
+    if old.temenos then
+        settings.limbus_chest_order.temenos = {
+            ["N4"] = old.temenos.N7 or old.temenos.N4 or 4,
+            ["W4"] = old.temenos.W7 or old.temenos.W4 or 3,
+            ["E4"] = old.temenos.E7 or old.temenos.E4 or 2,
+            ["C3"] = old.temenos.C4 or old.temenos.C3 or 1,
+        }
+    end
+    settings.version = 2
+    config.save(settings)
+end
+-- Handle one time table conversion for new temenos floor format.
+migrate_limbus_chest_order()
+
 local function set_chest_order(data)
     data = data:lower()
     local zone, tower
@@ -229,13 +273,13 @@ local function set_chest_order(data)
     elseif data:find("se", 1, true) then
         zone, tower = "apollyon" , "SE4"
     elseif data:find("n", 1, true) then
-        zone, tower = "temenos" , "N7"
+        zone, tower = "temenos" , "N4"
     elseif data:find("w", 1, true) then
-        zone, tower = "temenos" , "W7"
+        zone, tower = "temenos" , "W4"
     elseif data:find("e", 1, true) then
-        zone, tower = "temenos" , "E7"
+        zone, tower = "temenos" , "E4"
     elseif data:find("c", 1, true) then
-        zone, tower = "temenos" , "C4"
+        zone, tower = "temenos" , "C3"
     else
         log("Invalid argument, chest order tracking not updated.")
         return
@@ -245,7 +289,7 @@ local function set_chest_order(data)
 end
 
 function sync_chest_data(chestdata)
-    settings.limbus_chests = chestdata
+    settings.limbus_chest_order = chestdata
     config.save(settings)
     log('Limbus chest data synced.')
 end
@@ -497,7 +541,8 @@ function poke_npc(id, index)
             first_poke = false
             coroutine.sleep(1.5)
         else
-            coroutine.sleep(settings.default_packet_wait_timeout)
+            coroutine.sleep(1.75)
+            --coroutine.sleep(settings.default_packet_wait_timeout)
         end
     end
     timing.poke_time = nil
@@ -931,7 +976,7 @@ local function smart_command(best, short_name)
         end
     elseif best.interaction == 'exit' then
         if best.npc.name:find('Maw', 1, true) then
-            if maps.abyssea.entry_zones:contains(zone_check) then
+            if maps.abyssea.entry_zones and maps.abyssea.entry_zones:contains(zone_check) then
                 best.interaction = 'enter'
             end
         end
@@ -1216,7 +1261,7 @@ windower.register_event('addon command', function(...)
         else
             local zone_name = resources.zones[windower.ffxi.get_info().zone].name:lower()
             if zone_name == 'apollyon' or zone_name == 'temenos' then
-                for k, v in pairs (settings.limbus_chests[zone_name]) do
+                for k, v in pairs (settings.limbus_chest_order[zone_name]) do
                     if v == 4 then
                         log("Open chest at "..k)
                         break
@@ -1227,7 +1272,7 @@ windower.register_event('addon command', function(...)
             end
         end
     elseif cmd and cmd:contains('sync') then
-        local chestdata = T(settings.limbus_chests):tovstring()
+        local chestdata = T(settings.limbus_chest_order):tovstring()
         chestdata = chestdata:gsub('%s+', '')
         windower.send_ipc_message(
             'sync_limbus_chests '..chestdata
@@ -1760,19 +1805,19 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
         --debug("out 0x05C: "..t.name..", menu:"..tostring(p['Menu ID'])..", zone:"..tostring(p['Zone'])..", x:"..string.format('%0.3f', p['X'])..", z:"..string.format('%0.3f', p['Z'])..", y:"..string.format('%0.3f', p['Y'])..", _u1:"..tostring(p['_unknown1'])..", _u3:"..tostring(p['_unknown3']))
     elseif id == 0x05B and in_limbus_zone then  -- only look at these packets when we're in limbus
         local p = packets.parse('outgoing', data)
-        if p["Target"] >= 16929659 and p["Target"] <= 16929662 then
+        if p["Target"] >= 16929362 and p["Target"] <= 16929365 then
             if p['Automated Message'] == true then --Filter x2 calls and/or interrupts
                 if current_zone == 37 then
                     local zone = 'temenos'
                     local tower = nil
-                    if p["Target"] == 16929659 then
-                        tower = "N7"
-                    elseif p["Target"] == 16929660 then
-                        tower = "W7"
-                    elseif p["Target"] == 16929661 then
-                        tower = "E7"
-                    elseif p["Target"] == 16929662 then
-                        tower = "C4"
+                    if p["Target"] == 16929362 then
+                        tower = "N4"
+                    elseif p["Target"] == 16929363 then
+                        tower = "W4"
+                    elseif p["Target"] == 16929364 then
+                        tower = "E4"
+                    elseif p["Target"] == 16929365 then
+                        tower = "C3"
                     end
                     if tower then
                         add_table_entry(zone, tower)
@@ -1807,7 +1852,7 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
 end)
 windower.register_event('load', function()
     if not settings.understood then
-        windower.add_to_chat(207,'\n Welcome to superwarp 1.1.1. Now use sw in place of  hp, wp, sg, un, so, li, ew, ab etc -  for all warp commands!!\n The new smart-command is "//sw" by itself. It autohandles all warp scenarios where a destination need not be specified. i.e. so port or ab enter. It works as any subcommand for any map except others where multiple are usable, in those cases it always serves as one. i.e. next cmd for limbus.')
+        windower.add_to_chat(207,'\n Welcome to superwarp 1.1.2. Now use sw in place of  hp, wp, sg, un, so, li, ew, ab etc -  for all warp commands!!\n The new smart-command is "//sw" by itself. It autohandles all warp scenarios where a destination need not be specified. i.e. so port or ab enter. It works as any subcommand for any map except others where multiple are usable, in those cases it always serves as one. i.e. next cmd for limbus.')
         windower.add_to_chat(207,' All legacy functionality is still in place.')
         windower.add_to_chat(207,' sw help to list all information.')
         windower.add_to_chat(207,' sw understood to stop displaying these messages on load.')
@@ -1817,6 +1862,7 @@ windower.register_event('login', function()
     player_info = windower.ffxi.get_player()
     if not player_info then return end
     settings = config.load(('data/settings_%s.xml'):format(player_info.name),defaults)
+    migrate_limbus_chest_order()
 end)
 windower.register_event('unload', function()
 	if windower.ffxi.get_info().logged_in then

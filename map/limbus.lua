@@ -13,89 +13,69 @@ local npc_names = T{
 
    local destination_array = {
         ['apollyon'] = {
-	   E1  = {display_name = 'Entrance 1', zone = 38, menu_id = 102,  index = 671, npc = 16933535, offset = 1, x = -608,z = 0, y = -600,h = 126, unknown1 = 1,  unknown2 = 1},
-	   E2  = {display_name = 'Entrance 2', zone = 38, menu_id = 103,  index = 672, npc = 16933536, offset = 1, x = 608,z = 0, y = -600,h = 0,   unknown1 = 1,  unknown2 = 1},
-	   NW1 = {display_name = 'Northwest 1', zone = 38, menu_id = 104,  index = 673, npc = 16933537, offset = 1, x = -440.00003051758, z = 0, y = -88.000007629395,  h = 191, unknown1 = 11, unknown2 = 1},
-	   NW2 = {display_name = 'Northwest 2', zone = 38, menu_id = 105,  index = 674, npc = 16933538, offset = 2, x = -534,z = 0, y = 171.00001525879,h = 159, unknown1 = 12, unknown2 = 1},
-	   NW3 = {display_name = 'Northwest 3', zone = 38, menu_id = 106,  index = 675, npc = 16933539, offset = 3, x = -294,z = 0, y = 171.00001525879,h = 159, unknown1 = 13, unknown2 = 1},
-	   NW4 = {display_name = 'Northwest 4', zone = 38, menu_id = 107,  index = 676, npc = 16933540, offset = 4, x = -628,z = 0, y = 497.00003051758,h = 223, unknown1 = 14, unknown2 = 1},
-	   NW5 = {display_name = 'Northwest 5', zone = 38, menu_id = 108,  index = 677, npc = 16933541, offset = 5, x = -388,z = 0, y = 498.00003051758,h = 223, unknown1 = 15, unknown2 = 1},
-	   SW1 = {display_name = 'Southwest 1', zone = 38, menu_id = 109,  index = 678, npc = 16933542, offset = 3, x = -468.00003051758, z = 0, y = -625,h = 223, unknown1 = 21, unknown2 = 1},
-	   SW2 = {display_name = 'Southwest 2', zone = 38, menu_id = 110,  index = 679, npc = 16933543, offset = 4, x = -576,z = 0, y = -428.00003051758,  h = 159, unknown1 = 22, unknown2 = 1},
-	   SW3 = {display_name = 'Southwest 3', zone = 38, menu_id = 111,  index = 680, npc = 16933544, offset = 0, x = -428.00003051758, z = 0, y = -385.00003051758,  h = 223, unknown1 = 23, unknown2 = 1},
-	   SW4 = {display_name = 'Southwest 4', zone = 38, menu_id = 112,  index = 681, npc = 16933545, offset = 5, x = -176.00001525879, z = 0, y = -628,h = 159, unknown1 = 24, unknown2 = 1},
-	   NE1 = {display_name = 'Northeast 1', zone = 38, menu_id = 113,  index = 682, npc = 16933546, offset = 9, x = 440.00003051758,  z = 0, y = -88.000007629395,  h = 191, unknown1 = 31, unknown2 = 1},
-	   NE2 = {display_name = 'Northeast 2', zone = 38, menu_id = 114,  index = 683, npc = 16933547, offset = 10,x = 534,z = 0, y = 171.00001525879,h = 223, unknown1 = 32, unknown2 = 1},
-	   NE3 = {display_name = 'Northeast 3', zone = 38, menu_id = 115,  index = 684, npc = 16933548, offset = 10,x = 294,z = 0, y = 171.00001525879,h = 223, unknown1 = 33, unknown2 = 1},
-	   NE4 = {display_name = 'Northeast 4', zone = 38, menu_id = 116,  index = 685, npc = 16933549, offset = 1, x = 628,z = 0, y = 497.00003051758,h = 159, unknown1 = 34, unknown2 = 1},
-	   NE5 = {display_name = 'Northeast 5', zone = 38, menu_id = 117,  index = 686, npc = 16933550, offset = 2, x = 388.00003051758,  z = 0, y = 498.00003051758,h = 159, unknown1 = 35, unknown2 = 1},
-	   SE1 = {display_name = 'Southeast 1', zone = 38, menu_id = 118,  index = 687, npc = 16933551, offset = 5, x = 468.00003051758,  z = 0, y = -625,h = 159, unknown1 = 41, unknown2 = 1},
-	   SE2 = {display_name = 'Southeast 2', zone = 38, menu_id = 119,  index = 688, npc = 16933552, offset = 6, x = 576,z = 0, y = -428.00003051758,  h = 223, unknown1 = 42, unknown2 = 1},
-	   SE3 = {display_name = 'Southeast 3', zone = 38, menu_id = 120,  index = 689, npc = 16933553, offset = 7, x = 428.00003051758,  z = 0, y = -385.00003051758,  h = 159, unknown1 = 43, unknown2 = 1},
-	   SE4 = {display_name = 'Southeast 4', zone = 38, menu_id = 121,  index = 690, npc = 16933554, offset = 8, x = 176.00001525879,  z = 0, y = -628,h = 223, unknown1 = 44, unknown2 = 1},
-	   CN = {display_name = 'Apollyon CN',  zone = 38, menu_id = 123,  index = 691, npc = 16933555, offset = 8, x = 0,  z = 0, y = 196.00001525879,h = 63, unknown1 = 51, unknown2 = 1},
+	   E1  = {display_name = 'Entrance 1', zone = 38, menu_id = 102,  index = 678, npc = 16933542, offset = 1, x = -608,z = 0, y = -600,h = 126, unknown1 = 1,  unknown2 = 1},
+	   E2  = {display_name = 'Entrance 2', zone = 38, menu_id = 103,  index = 679, npc = 169335543, offset = 1, x = 608,z = 0, y = -600,h = 0,   unknown1 = 1,  unknown2 = 1},
+	   NW1 = {display_name = 'Northwest 1', zone = 38, menu_id = 104,  index = 680, npc = 16933544, offset = 1, x = -440.00003051758, z = 0, y = -88.000007629395,  h = 191, unknown1 = 11, unknown2 = 1},
+	   NW2 = {display_name = 'Northwest 2', zone = 38, menu_id = 105,  index = 681, npc = 16933545, offset = 2, x = -534,z = 0, y = 171.00001525879,h = 159, unknown1 = 12, unknown2 = 1},
+	   NW3 = {display_name = 'Northwest 3', zone = 38, menu_id = 106,  index = 682, npc = 16933546, offset = 3, x = -294,z = 0, y = 171.00001525879,h = 159, unknown1 = 13, unknown2 = 1},
+	   NW4 = {display_name = 'Northwest 4', zone = 38, menu_id = 107,  index = 683, npc = 16933547, offset = 4, x = -628,z = 0, y = 497.00003051758,h = 223, unknown1 = 14, unknown2 = 1},
+	   NW5 = {display_name = 'Northwest 5', zone = 38, menu_id = 108,  index = 684, npc = 16933548, offset = 5, x = -388,z = 0, y = 498.00003051758,h = 223, unknown1 = 15, unknown2 = 1},
+	   SW1 = {display_name = 'Southwest 1', zone = 38, menu_id = 109,  index = 685, npc = 16933549, offset = 3, x = -468.00003051758, z = 0, y = -625,h = 223, unknown1 = 21, unknown2 = 1},
+	   SW2 = {display_name = 'Southwest 2', zone = 38, menu_id = 110,  index = 686, npc = 16933550, offset = 4, x = -576,z = 0, y = -428.00003051758,  h = 159, unknown1 = 22, unknown2 = 1},
+	   SW3 = {display_name = 'Southwest 3', zone = 38, menu_id = 111,  index = 687, npc = 16933551, offset = 0, x = -428.00003051758, z = 0, y = -385.00003051758,  h = 223, unknown1 = 23, unknown2 = 1},
+	   SW4 = {display_name = 'Southwest 4', zone = 38, menu_id = 112,  index = 688, npc = 16933552, offset = 5, x = -176.00001525879, z = 0, y = -628,h = 159, unknown1 = 24, unknown2 = 1},
+	   NE1 = {display_name = 'Northeast 1', zone = 38, menu_id = 113,  index = 689, npc = 16933553, offset = 9, x = 440.00003051758,  z = 0, y = -88.000007629395,  h = 191, unknown1 = 31, unknown2 = 1},
+	   NE2 = {display_name = 'Northeast 2', zone = 38, menu_id = 114,  index = 690, npc = 16933554, offset = 10,x = 534,z = 0, y = 171.00001525879,h = 223, unknown1 = 32, unknown2 = 1},
+	   NE3 = {display_name = 'Northeast 3', zone = 38, menu_id = 115,  index = 691, npc = 16933555, offset = 10,x = 294,z = 0, y = 171.00001525879,h = 223, unknown1 = 33, unknown2 = 1},
+	   NE4 = {display_name = 'Northeast 4', zone = 38, menu_id = 116,  index = 692, npc = 16933556, offset = 1, x = 628,z = 0, y = 497.00003051758,h = 159, unknown1 = 34, unknown2 = 1},
+	   NE5 = {display_name = 'Northeast 5', zone = 38, menu_id = 117,  index = 693, npc = 16933557, offset = 2, x = 388.00003051758,  z = 0, y = 498.00003051758,h = 159, unknown1 = 35, unknown2 = 1},
+	   SE1 = {display_name = 'Southeast 1', zone = 38, menu_id = 118,  index = 694, npc = 16933558, offset = 5, x = 468.00003051758,  z = 0, y = -625,h = 159, unknown1 = 41, unknown2 = 1},
+	   SE2 = {display_name = 'Southeast 2', zone = 38, menu_id = 119,  index = 695, npc = 16933559, offset = 6, x = 576,z = 0, y = -428.00003051758,  h = 223, unknown1 = 42, unknown2 = 1},
+	   SE3 = {display_name = 'Southeast 3', zone = 38, menu_id = 120,  index = 696, npc = 16933560, offset = 7, x = 428.00003051758,  z = 0, y = -385.00003051758,  h = 159, unknown1 = 43, unknown2 = 1},
+	   SE4 = {display_name = 'Southeast 4', zone = 38, menu_id = 121,  index = 697, npc = 16933561, offset = 8, x = 176.00001525879,  z = 0, y = -628,h = 223, unknown1 = 44, unknown2 = 1},
+	   CN = {display_name = 'Central Apollyon',  zone = 38, menu_id = 123,  index = 698, npc = 16933562, offset = 8, x = 0,  z = 0, y = 196.00001525879,h = 63, unknown1 = 51, unknown2 = 1},
         },
     ['temenos'] ={
-       E  = {display_name = 'Entrance' ,        zone = 37, menu_id = 1000, index = 795, npc = 16929563, offset = 1, x = 580, z = 0 ,  y = 86.000007629395,   h = 63,  unknown1 = 1 , unknown2 = 1},
-	   N1 = {display_name = 'Northern Tower 1', zone = 37, menu_id = 1001, index = 853, npc = 16929621, offset = 1, x = 380.00003051758,  z = 71.620002746582 , y = 376.00003051758,   h = 191, unknown1 = 11 ,unknown2 = 1},
-	   N2 = {display_name = 'Northern Tower 2', zone = 37, menu_id = 1002, index = 854, npc = 16929622, offset = 2, x = 180.00001525879,  z = -82.380004882812 ,y = 376.00003051758,   h = 191, unknown1 = 12 ,unknown2 = 1},
-	   N3 = {display_name = 'Northern Tower 3', zone = 37, menu_id = 1003, index = 855, npc = 16929623, offset = 3, x = 60.000003814697,  z = 71.620002746582 , y = 376.00003051758,   h = 191, unknown1 = 13 ,unknown2 = 1},
-	   N4 = {display_name = 'Northern Tower 4', zone = 37, menu_id = 1004, index = 856, npc = 16929624, offset = 4, x = -140,z = -82.380004882812 ,y = 376.00003051758,   h = 191, unknown1 = 14 ,unknown2 = 1},
-	   N5 = {display_name = 'Northern Tower 5', zone = 37, menu_id = 1005, index = 857, npc = 16929625, offset = 5, x = -260,z = 77.620002746582 , y = 376.00003051758,   h = 191, unknown1 = 15, unknown2 = 1},
-	   N6 = {display_name = 'Northern Tower 6', zone = 37, menu_id = 1006, index = 858, npc = 16929626, offset = 1, x = -460.00003051758, z = -82.380004882812 ,y = 376.00003051758,   h = 191, unknown1 = 16, unknown2 = 1},
-	   N7 = {display_name = 'Northern Tower 7', zone = 37, menu_id = 1007, index = 859, npc = 16929627, offset = 2, x = -580,z = 77.620002746582 , y = 376.00003051758,   h = 191, unknown1 = 17, unknown2 = 1},
-	   W1 = {display_name = 'Western Tower 1',  zone = 37, menu_id = 1008, index = 860, npc = 16929628, offset = 3, x = 380.00003051758,  z = -2.3800001144409 ,y = 96.000007629395,   h = 191, unknown1 = 21, unknown2 = 1},
-	   W2 = {display_name = 'Western Tower 2',  zone = 37, menu_id = 1009, index = 861, npc = 16929629, offset = 4, x = 180.00001525879,  z = -162.38000488281 ,y = 96.000007629395,   h = 191, unknown1 = 22, unknown2 = 1},
-	   W3 = {display_name = 'Western Tower 3',  zone = 37, menu_id = 1010, index = 862, npc = 16929630, offset = 0, x = 60.000003814697,  z = -2.3800001144409 ,y = 96.000007629395,   h = 191, unknown1 = 23, unknown2 = 1},
-	   W4 = {display_name = 'Western Tower 4',  zone = 37, menu_id = 1011, index = 863, npc = 16929631, offset = 5, x = -140,z = -162.38000488281 ,y = 96.000007629395,   h = 191, unknown1 = 24, unknown2 = 1},
-	   W5 = {display_name = 'Western Tower 5',  zone = 37, menu_id = 1012, index = 864, npc = 16929632, offset = 6, x = -260,z = -2.3800001144409 ,y = 96.000007629395,   h = 191, unknown1 = 25, unknown2 = 1},
-	   W6 = {display_name = 'Western Tower 6',  zone = 37, menu_id = 1013, index = 865, npc = 16929633, offset = 7, x = -460.00003051758, z = -162.38000488281 ,y = 96.000007629395,   h = 191, unknown1 = 26, unknown2 = 1},
-	   W7 = {display_name = 'Western Tower 7',  zone = 37, menu_id = 1014, index = 866, npc = 16929634, offset = 8, x = -580,z = -2.3800001144409, y = 96.000007629395,   h = 191, unknown1 = 27, unknown2 = 1},
-	   E1 = {display_name = 'Eastern Tower 1',  zone = 37, menu_id = 1015, index = 867, npc = 16929635, offset = 9, x = 380.00003051758,  z = 71.620002746582,  y = -184.00001525879,  h = 191, unknown1 = 31, unknown2 = 1},
-	   E2 = {display_name = 'Eastern Tower 2',  zone = 37, menu_id = 1016, index = 868, npc = 16929636, offset = 10,x = 180.00001525879,  z = -82.380004882812, y = -184.00001525879,  h = 191, unknown1 = 32, unknown2 = 1},
-	   E3 = {display_name = 'Eastern Tower 3',  zone = 37, menu_id = 1017, index = 869, npc = 16929637, offset = 10,x = 60.000003814697,  z = 71.620002746582,  y = -184.00001525879,  h = 191, unknown1 = 33, unknown2 = 1},
-	   E4 = {display_name = 'Eastern Tower 4',  zone = 37, menu_id = 1018, index = 870, npc = 16929638, offset = 1, x = -140,z = -82.380004882812, y = -184.00001525879,  h = 191, unknown1 = 34, unknown2 = 1},
-	   E5 = {display_name = 'Eastern Tower 5',  zone = 37, menu_id = 1019, index = 871, npc = 16929639, offset = 2, x = -260,z = 77.620002746582,  y = -184.00001525879,  h = 191, unknown1 = 35, unknown2 = 1},
-	   E6 = {display_name = 'Eastern Tower 6',  zone = 37, menu_id = 1020, index = 872, npc = 16929640, offset = 3, x = -460.00003051758, z = -82.380004882812, y = -184.00001525879,  h = 191, unknown1 = 36, unknown2 = 1},
-	   E7 = {display_name = 'Eastern Tower 7',  zone = 37, menu_id = 1021, index = 873, npc = 16929641, offset = 4, x = -580,z = 77.620002746582,   y = -184.00001525879, h = 191, unknown1 = 37, unknown2 = 1},
-	   C1 = {display_name = 'Central Tower 1',  zone = 37, menu_id = 1022, index = 874, npc = 16929642, offset = 5, x = 580, z = -2.3800001144409, y = -544, h = 191, unknown1 = 41, unknown2 = 1},
-	   C2 = {display_name = 'Central Tower 2',  zone = 37, menu_id = 1023, index = 875, npc = 16929643, offset = 6, x = 260, z = -162.38000488281, y = -504.00003051758,  h = 191, unknown1 = 42, unknown2 = 1},
-	   C3 = {display_name = 'Central Tower 3',  zone = 37, menu_id = 1024, index = 876, npc = 16929644, offset = 7, x = 20,  z = -2.3800001144409, y = -544, h = 191, unknown1 = 43, unknown2 = 1},
-	   C4 = {display_name = 'Central Tower 4',  zone = 37, menu_id = 1025, index = 877, npc = 16929645, offset = 8, x = -296,z = -162.38000488281, y = -500.00003051758,  h = 127, unknown1 = 44, unknown2 = 1},
-	   CN = {display_name = 'Temenos CN',       zone = 37, menu_id = 1026, index = 878, npc = 16929646, offset = 8, x = -540,z = -2.3800001144409, y = -584,  h = 191, unknown1 = 51, unknown2 = 1},   
+       E  = {display_name = 'Entrance' ,        zone = 37, menu_id = 1000, index = 510, npc = 16929278, offset = 1, x = 580, z = 0 ,  y = 86.000007629395,   h = 63,  unknown1 = 1 , unknown2 = 1},
+	   N1 = {display_name = 'Northern Tower 1', zone = 37, menu_id = 1004, index = 571, npc = 16929339, offset = 1, x = -140,z = -82.380004882812 ,y = 376.00003051758,   h = 191, unknown1 = 11 ,unknown2 = 1},
+	   N2 = {display_name = 'Northern Tower 2', zone = 37, menu_id = 1005, index = 572, npc = 16929340, offset = 2, x = -260,z = 77.620002746582 , y = 376.00003051758, h = 191, unknown1 = 12 ,unknown2 = 1},
+	   N3 = {display_name = 'Northern Tower 3', zone = 37, menu_id = 1006, index = 573, npc = 16929341, offset = 3, x = -460.00003051758, z = -82.380004882812 ,y = 376.00003051758,   h = 191, unknown1 = 13 ,unknown2 = 1},
+	   N4 = {display_name = 'Northern Tower 4', zone = 37, menu_id = 1007, index = 574, npc = 16929342, offset = 4, x = -580,z = 77.620002746582 , y = 376.00003051758,   h = 191, unknown1 = 14 ,unknown2 = 1},
+	   W1 = {display_name = 'Western Tower 1',  zone = 37, menu_id = 1011, index = 578, npc = 16929346, offset = 3, x = -140,z = -162.38000488281 ,y = 96.000007629395,                h = 191, unknown1 = 21, unknown2 = 1},
+	   W2 = {display_name = 'Western Tower 2',  zone = 37, menu_id = 1012, index = 579, npc = 16929347, offset = 4, x = -260,z = -2.3800001144409 ,y = 96.000007629395,                h = 191, unknown1 = 22, unknown2 = 1},
+	   W3 = {display_name = 'Western Tower 3',  zone = 37, menu_id = 1013, index = 580, npc = 16929348, offset = 0, x = -460.00003051758, z = -162.38000488281 ,y = 96.000007629395,   h = 191, unknown1 = 23, unknown2 = 1},
+	   W4 = {display_name = 'Western Tower 4',  zone = 37, menu_id = 1014, index = 581, npc = 16929349, offset = 5, x = -580,z = -2.3800001144409, y = 96.000007629395,                h = 191, unknown1 = 24, unknown2 = 1},
+	   E1 = {display_name = 'Eastern Tower 1',  zone = 37, menu_id = 1018, index = 585, npc = 16929353, offset = 9,  x = -140,z = -82.380004882812, y = -184.00001525879,               h = 191, unknown1 = 31, unknown2 = 1},
+	   E2 = {display_name = 'Eastern Tower 2',  zone = 37, menu_id = 1019, index = 586, npc = 16929354, offset = 10, x = -260,z = 77.620002746582,  y = -184.00001525879,               h = 191, unknown1 = 32, unknown2 = 1},
+	   E3 = {display_name = 'Eastern Tower 3',  zone = 37, menu_id = 1020, index = 587, npc = 16929355, offset = 10, x = -460.00003051758, z = -82.380004882812, y = -184.00001525879,  h = 191, unknown1 = 33, unknown2 = 1},
+	   E4 = {display_name = 'Eastern Tower 4',  zone = 37, menu_id = 1021, index = 588, npc = 16929356, offset = 1,  x = -580,z = 77.620002746582,   y = -184.00001525879,              h = 191, unknown1 = 34, unknown2 = 1},
+	   C1 = {display_name = 'Central Tower 1',  zone = 37, menu_id = 1023, index = 590, npc = 16929358, offset = 5, x = 260, z = -162.38000488281, y = -504.00003051758,  h = 191, unknown1 = 41, unknown2 = 1},
+	   C2 = {display_name = 'Central Tower 2',  zone = 37, menu_id = 1024, index = 591, npc = 16929359, offset = 6, x = 20,  z = -2.3800001144409, y = -544,              h = 191, unknown1 = 42, unknown2 = 1},
+	   C3 = {display_name = 'Central Tower 3',  zone = 37, menu_id = 1025, index = 592, npc = 16929360, offset = 7, x = -296,z = -162.38000488281, y = -500.00003051758,  h = 127, unknown1 = 43, unknown2 = 1},
+	   CN = {display_name = 'Temenos Central B1',zone = 37, menu_id = 1026, index = 594, npc = 16929361, offset = 8, x = -540,z = -2.3800001144409, y = -584,  h = 191, unknown1 = 51, unknown2 = 1},   
          }
 	}
-
+---------------------------
 local temenos_temp_item_ids = {
    -- North
         ["N1"] = 9956,
         ["N2"] = 9957,
         ["N3"] = 9958,
         ["N4"] = 9959,
-        ["N5"] = 9960,
-        ["N6"] = 9961,
-        ["N7"] = 9962,
    -- West
         ["W1"] = 9963,
         ["W2"] = 9964,
         ["W3"] = 9965,
         ["W4"] = 9966,
-        ["W5"] = 9967,
-        ["W6"] = 9968,
-        ["W7"] = 9969,
    --East
         ["E1"] = 9970,
         ["E2"] = 9971,
         ["E3"] = 9972,
         ["E4"] = 9973,
-        ["E5"] = 9974,
-        ["E6"] = 9975,
-        ["E7"] = 9976,
    -- Central
         ["C1"] = 9977,
         ["C2"] = 9978,
         ["C3"] = 9979,
-        ["C4"] = 9980,
 }
 
 local apollyon_temp_item_ids = {
@@ -141,10 +121,10 @@ local apollyon_floor_order = {
 }
 
 local temenos_floor_order = {
-    "N1","N2","N3","N4","N5","N6","N7",
-    "W1","W2","W3","W4","W5","W6","W7",
-    "E1","E2","E3","E4","E5","E6","E7",
-    "C1","C2","C3","C4"
+    "N1","N2","N3","N4",
+    "W1","W2","W3","W4",
+    "E1","E2","E3","E4",
+    "C1","C2","C3",
 }
 
 local function find_5k_chest(zone_id)
@@ -152,7 +132,7 @@ local function find_5k_chest(zone_id)
 
     if zone_id == 37 then
         zone = "temenos"
-        chest_keys = { "N7", "W7", "E7", "C4" }
+        chest_keys = { "N4", "W4", "E4", "C3" }
     elseif zone_id == 38 then
         zone = "apollyon"
         chest_keys = { "NW5", "SW4", "NE5", "SE4" }
@@ -160,7 +140,7 @@ local function find_5k_chest(zone_id)
         return nil
     end
 
-    local chest_table = settings.limbus_chests[zone]
+    local chest_table = settings.limbus_chest_order[zone]
     if not chest_table then return nil end
 
     for _, key in ipairs(chest_keys) do
@@ -483,7 +463,7 @@ if zone == 38 then
 				return 'Cannot warp to other towers from here.'
 			end
 		end
-    end 
+    end
 		--------------------------------------------------------------------------------------------------------------------------------------------   
 		 --  Temenos
         --------------------------------------------------------------------------------------------------------------------------------------------
@@ -518,64 +498,45 @@ elseif zone == 37 then
 				if menu_id == destination.menu_id then
 					return "Open chest on this floor."
 				end
-			end 
-		--------------------------------------------
+			end
 		elseif current_activity.sub_cmd == 'port' then
-			if menu_id >= 1000 and menu_id <= 1008 then
+			if menu_id == 1000 or (menu_id >= 1004 and menu_id <= 1007) then
 				if menu_id == 1000 then
 					destination = destination_array.temenos.N1
-				elseif menu_id == 1001 then
-					destination = destination_array.temenos.N2
-				elseif menu_id == 1002 then
-					destination = destination_array.temenos.N3
-				elseif menu_id == 1003 then
-					destination = destination_array.temenos.N4
 				elseif menu_id == 1004 then
-					destination = destination_array.temenos.N5
+					destination = destination_array.temenos.N2
 				elseif menu_id == 1005 then
-					destination = destination_array.temenos.N6
+					destination = destination_array.temenos.N3
 				elseif menu_id == 1006 then
-					destination = destination_array.temenos.N7
+					destination = destination_array.temenos.N4
 				elseif menu_id == 1007 then
 					destination = destination_array.temenos.E
-				elseif menu_id == 1008 then
-					destination = destination_array.temenos.W2
 				end
-			elseif menu_id >= 1009 and menu_id <= 1016 then
-				if menu_id == 1009 then
-					destination = destination_array.temenos.W3
-				elseif menu_id == 1010 then
-					destination = destination_array.temenos.W4
-				elseif menu_id == 1011 then
-					destination = destination_array.temenos.W5
+			elseif menu_id >= 1011 and menu_id <= 1014 then
+				if menu_id == 1011 then
+					destination = destination_array.temenos.W2
 				elseif menu_id == 1012 then
-					destination = destination_array.temenos.W6
+					destination = destination_array.temenos.W3
 				elseif menu_id == 1013 then
-					destination = destination_array.temenos.W7
+					destination = destination_array.temenos.W4
 				elseif menu_id == 1014 then
 					destination = destination_array.temenos.E
-				elseif menu_id == 1015 then
-					destination = destination_array.temenos.E2
-				elseif menu_id == 1016 then
-					destination = destination_array.temenos.E3
 				end
-			elseif menu_id >= 1017 and menu_id <= 1026 then
-				if menu_id == 1017 then
-					destination = destination_array.temenos.E4
-				elseif menu_id == 1018 then
-					destination = destination_array.temenos.E5
+			elseif menu_id >= 1018 and menu_id <= 1021 then
+				if menu_id == 1018 then
+					destination = destination_array.temenos.E2
 				elseif menu_id == 1019 then
-					destination = destination_array.temenos.E6
+					destination = destination_array.temenos.E3
 				elseif menu_id == 1020 then
-					destination = destination_array.temenos.E7
+					destination = destination_array.temenos.E4
 				elseif menu_id == 1021 then
 					destination = destination_array.temenos.E
-				elseif menu_id == 1022 then
+				end
+			elseif menu_id >= 1023 and menu_id <= 1026 then
+				if menu_id == 1023 then
 					destination = destination_array.temenos.C2
-				elseif menu_id == 1023 then
-					destination = destination_array.temenos.C3
 				elseif menu_id == 1024 then
-					destination = destination_array.temenos.C4
+					destination = destination_array.temenos.C3
 				elseif menu_id == 1025 then
 					destination = destination_array.temenos.E
 				elseif menu_id == 1026 then
@@ -583,65 +544,47 @@ elseif zone == 37 then
 				end
 			end
 		elseif current_activity.sub_cmd == 'back' then
-			if menu_id <= 1026 and menu_id >= 1017 then
+			if menu_id <= 1026 and menu_id >= 1023 then
 				if menu_id == 1026 then
 					destination = destination_array.temenos.E
 				elseif menu_id == 1025 then
-					destination = destination_array.temenos.C3
-				elseif menu_id == 1024 then
 					destination = destination_array.temenos.C2
-				elseif menu_id == 1023 then
+				elseif menu_id == 1024 then
 					destination = destination_array.temenos.C1
-				elseif menu_id == 1022 then
+				elseif menu_id == 1023 then
 					destination = destination_array.temenos.E
-				elseif menu_id == 1021 then
-					destination = destination_array.temenos.E6
-				elseif menu_id == 1020 then
-					destination = destination_array.temenos.E5
-				elseif menu_id == 1019 then
-					destination = destination_array.temenos.E4
-				elseif menu_id == 1018 then
+				end
+			elseif menu_id <= 1021 and menu_id >= 1018 then
+				if menu_id == 1021 then
 					destination = destination_array.temenos.E3
-				elseif menu_id == 1017 then
+				elseif menu_id == 1020 then
 					destination = destination_array.temenos.E2
-				end
-			elseif menu_id <= 1016 and menu_id >= 1008 then
-				if menu_id == 1016 then
+				elseif menu_id == 1019 then
 					destination = destination_array.temenos.E1
-				elseif menu_id == 1015 then
-					destination = destination_array.temenos.E
-				elseif menu_id == 1014 then
-					destination = destination_array.temenos.W6
-				elseif menu_id == 1013 then
-					destination = destination_array.temenos.W5
-				elseif menu_id == 1012 then
-					destination = destination_array.temenos.W4
-				elseif menu_id == 1011 then
-					destination = destination_array.temenos.W3
-				elseif menu_id == 1010 then
-					destination = destination_array.temenos.W2
-				elseif menu_id == 1009 then
-					destination = destination_array.temenos.W1
-				elseif menu_id == 1008 then
+				elseif menu_id == 1018 then
 					destination = destination_array.temenos.E
 				end
-			elseif menu_id <= 1007 and menu_id >= 1000 then
+			elseif menu_id <= 1014 and menu_id >= 1011 then
+				if menu_id == 1014 then
+					destination = destination_array.temenos.W3
+				elseif menu_id == 1013 then
+					destination = destination_array.temenos.W2
+				elseif menu_id == 1012 then
+					destination = destination_array.temenos.W1
+				elseif menu_id == 1011 then
+					destination = destination_array.temenos.E
+				end
+			elseif (menu_id <= 1007 and menu_id >= 1004) or menu_id == 1000 then
 				if menu_id == 1007 then
-					destination = destination_array.temenos.N6
-				elseif menu_id == 1006 then
-					destination = destination_array.temenos.N5
-				elseif menu_id == 1005 then	
-					destination = destination_array.temenos.N4
-				elseif menu_id == 1004 then	
 					destination = destination_array.temenos.N3
-				elseif menu_id == 1003 then	
+				elseif menu_id == 1006 then
 					destination = destination_array.temenos.N2
-				elseif menu_id == 1002 then	
+				elseif menu_id == 1005 then	
 					destination = destination_array.temenos.N1
-				elseif menu_id == 1001 then	
+				elseif menu_id == 1004 then	
 					destination = destination_array.temenos.E
 				elseif menu_id == 1000 then
-					destination = destination_array.temenos.C4
+					destination = destination_array.temenos.C3
 				end
 			end
 		end
@@ -652,7 +595,7 @@ elseif zone == 37 then
         end
         -- prevent warping between towers / next command cross-tower destination entrance override
         ----------------North Tower--------------------------------------------------------------------------
-        if (menu_id >= 1001 and menu_id <= 1007) and destination.menu_id ~= 1000 and (destination.menu_id > 1007 or destination.menu_id < 1001) then
+        if (menu_id >= 1004 and menu_id <= 1007) and destination.menu_id ~= 1000 and (destination.menu_id > 1007 or destination.menu_id < 1004) then
 			if cross_tower_checkinator then 
 				cross_tower_checkinator = nil
 				destination = destination_array.temenos.E
@@ -661,7 +604,7 @@ elseif zone == 37 then
 			end
         end
         ----------------West Tower--------------------------------------------------------------------------
-        if (menu_id >= 1008 and menu_id <= 1014) and destination.menu_id ~= 1000 and (destination.menu_id > 1014 or destination.menu_id < 1008) then
+        if (menu_id >= 1011 and menu_id <= 1014) and destination.menu_id ~= 1000 and (destination.menu_id > 1014 or destination.menu_id < 1011) then
 			if cross_tower_checkinator then 
 				cross_tower_checkinator = nil
 				destination = destination_array.temenos.E
@@ -670,7 +613,7 @@ elseif zone == 37 then
 			end
         end
         ----------------East Tower--------------------------------------------------------------------------
-        if (menu_id >= 1015 and menu_id <= 1021) and destination.menu_id ~= 1000 and (destination.menu_id > 1021 or destination.menu_id < 1015) then
+        if (menu_id >= 1018 and menu_id <= 1021) and destination.menu_id ~= 1000 and (destination.menu_id > 1021 or destination.menu_id < 1018) then
 			if cross_tower_checkinator then 
 				cross_tower_checkinator = nil
 				destination = destination_array.temenos.E
@@ -679,7 +622,7 @@ elseif zone == 37 then
 			end
         end
         ----------------Central Tower--------------------------------------------------------------------------
-        if (menu_id >= 1022 and menu_id <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1022) then
+        if (menu_id >= 1023 and menu_id <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1023) then
 			if cross_tower_checkinator then
 				cross_tower_checkinator = nil
 				destination = destination_array.temenos.E
@@ -720,7 +663,7 @@ end
 		return nil
     end,
     help_text = "| Limbus |\n Command options [li, te, ap]\n- li e1/nw1/sw2/ne5/se3   e/n1/w2/e5/c3 etc. -- warp to a designated tower and floor in limbus. \n- li next -- warp to the first uncompleted floor in sequence, if this is in another tower, will warp to the entrance.\n- li random -- Similar to the next command, sends you to floors you do not have the data for until you have collected all data; Will send you to other floors within the same tower until all are completed then will send to another tower/floor.\n- li port -- warp to the next floor of any tower, if on last floor will warp to the entrance, if at entrance will warp to first floor of the first tower. \n- li back -- the reverse of port command, teleports to the previous floor. If you are on the first floor of a tower this will send you to the entrance, if you are at the entrance this command will send you to the last floor of the last tower.\n- li enter -- enter apollyon. \n- li exit -- exit apollyon.\n------------------------------",
-    sub_zone_targets = S {'e1', 'e2', 'nw1', 'nw2', 'nw3', 'nw4', 'nw5', 'sw1', 'sw2', 'sw3','sw4', 'ne1', 'ne2', 'ne3', 'ne4', 'ne5', 'se1', 'se2', 'se3', 'se4','entrance','n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'w1', 'w2','w3', 'w4', 'w5', 'w6', 'w7', 'e1', 'e2', 'e3', 'e4', 'e5','e6','e7','c1','c2','c3','c4','cn'}, 
+    sub_zone_targets = S {'e1', 'e2', 'nw1', 'nw2', 'nw3', 'nw4', 'nw5', 'sw1', 'sw2', 'sw3','sw4', 'ne1', 'ne2', 'ne3', 'ne4', 'ne5', 'se1', 'se2', 'se3', 'se4','entrance','n1', 'n2', 'n3', 'n4', 'w1', 'w2','w3', 'w4', 'e1', 'e2', 'e3', 'e4', 'c1','c2','c3', 'cn'}, 
     auto_select_zone = function(zone)
         if zone == 38 then
             return 'apollyon'
@@ -794,7 +737,7 @@ end
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 2,
             description = 'complete menu'
         })
 
@@ -857,61 +800,43 @@ sub_commands = {
 		end
     elseif zone == 37 then
 		if current_activity.sub_cmd == 'port' then
-			if menu >= 1000 and menu <= 1008 then 
+			if menu == 1000 or (menu >= 1004 and menu <= 1007) then
 				if menu == 1000 then
 					destination = destination_array.temenos.N1
-				elseif menu == 1001 then
-					destination = destination_array.temenos.N2
-				elseif menu == 1002 then
-					destination = destination_array.temenos.N3
-				elseif menu == 1003 then
-					destination = destination_array.temenos.N4
 				elseif menu == 1004 then
-					destination = destination_array.temenos.N5
+					destination = destination_array.temenos.N2
 				elseif menu == 1005 then
-					destination = destination_array.temenos.N6
+					destination = destination_array.temenos.N3
 				elseif menu == 1006 then
-					destination = destination_array.temenos.N7
+					destination = destination_array.temenos.N4
 				elseif menu == 1007 then
 					destination = destination_array.temenos.E
-				elseif menu == 1008 then
-					destination = destination_array.temenos.W2
 				end
-			elseif menu >= 1009 and menu <= 1017 then
-				if menu == 1009 then
-					destination = destination_array.temenos.W3
-				elseif menu == 1010 then
-					destination = destination_array.temenos.W4
-				elseif menu == 1011 then
-					destination = destination_array.temenos.W5
+			elseif menu >= 1011 and menu <= 1014 then
+				if menu == 1011 then
+					destination = destination_array.temenos.W2
 				elseif menu == 1012 then
-					destination = destination_array.temenos.W6
+					destination = destination_array.temenos.W3
 				elseif menu == 1013 then
-					destination = destination_array.temenos.W7
+					destination = destination_array.temenos.W4
 				elseif menu == 1014 then
 					destination = destination_array.temenos.E
-				elseif menu == 1015 then
-					destination = destination_array.temenos.E2
-				elseif menu == 1016 then
-					destination = destination_array.temenos.E3
-				elseif menu == 1017 then
-					destination = destination_array.temenos.E4
 				end
-			elseif menu >= 1018 and menu <= 1026 then
+			elseif menu >= 1018 and menu <= 1021 then
 				if menu == 1018 then
-					destination = destination_array.temenos.E5
+					destination = destination_array.temenos.E2
 				elseif menu == 1019 then
-					destination = destination_array.temenos.E6
+					destination = destination_array.temenos.E3
 				elseif menu == 1020 then
-					destination = destination_array.temenos.E7
+					destination = destination_array.temenos.E4
 				elseif menu == 1021 then
 					destination = destination_array.temenos.E
-				elseif menu == 1022 then
+				end
+			elseif menu >= 1023 and menu <= 1026 then
+				if menu == 1023 then
 					destination = destination_array.temenos.C2
-				elseif menu == 1023 then
-					destination = destination_array.temenos.C3
 				elseif menu == 1024 then
-					destination = destination_array.temenos.C4
+					destination = destination_array.temenos.C3
 				elseif menu == 1025 then
 					destination = destination_array.temenos.E
 				elseif menu == 1026 then
@@ -988,7 +913,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 2,
             description = 'complete menu'
             })
             return actions
@@ -1050,65 +975,47 @@ sub_commands = {
 		end
     elseif zone == 37 then
 		if current_activity.sub_cmd == 'back' then
-			if menu <= 1026 and menu >= 1017 then
+			if menu <= 1026 and menu >= 1023 then
 				if menu == 1026 then
 					destination = destination_array.temenos.E
 				elseif menu == 1025 then
-					destination = destination_array.temenos.C3
-				elseif menu == 1024 then
 					destination = destination_array.temenos.C2
-				elseif menu == 1023 then
+				elseif menu == 1024 then
 					destination = destination_array.temenos.C1
-				elseif menu == 1022 then
+				elseif menu == 1023 then
 					destination = destination_array.temenos.E
-				elseif menu == 1021 then
-					destination = destination_array.temenos.E6
-				elseif menu == 1020 then
-					destination = destination_array.temenos.E5
-				elseif menu == 1019 then
-					destination = destination_array.temenos.E4
-				elseif menu == 1018 then
+				end
+			elseif menu <= 1021 and menu >= 1018 then
+				if menu == 1021 then
 					destination = destination_array.temenos.E3
-				elseif menu == 1017 then
+				elseif menu == 1020 then
 					destination = destination_array.temenos.E2
-				end
-			elseif menu <= 1016 and menu >= 1008 then
-				if menu == 1016 then
+				elseif menu == 1019 then
 					destination = destination_array.temenos.E1
-				elseif menu == 1015 then
-					destination = destination_array.temenos.E
-				elseif menu == 1014 then
-					destination = destination_array.temenos.W6
-				elseif menu == 1013 then
-					destination = destination_array.temenos.W5
-				elseif menu == 1012 then
-					destination = destination_array.temenos.W4
-				elseif menu == 1011 then
-					destination = destination_array.temenos.W3
-				elseif menu == 1010 then
-					destination = destination_array.temenos.W2
-				elseif menu == 1009 then
-					destination = destination_array.temenos.W1
-				elseif menu == 1008 then
+				elseif menu == 1018 then
 					destination = destination_array.temenos.E
 				end
-			elseif menu <= 1007 and menu >= 1000 then
+			elseif menu <= 1014 and menu >= 1011 then
+				if menu == 1014 then
+					destination = destination_array.temenos.W3
+				elseif menu == 1013 then
+					destination = destination_array.temenos.W2
+				elseif menu == 1012 then
+					destination = destination_array.temenos.W1
+				elseif menu == 1011 then
+					destination = destination_array.temenos.E
+				end
+			elseif (menu <= 1007 and menu >= 1004) or menu == 1000 then
 				if menu == 1007 then
-					destination = destination_array.temenos.N6
-				elseif menu == 1006 then
-					destination = destination_array.temenos.N5
-				elseif menu == 1005 then	
-					destination = destination_array.temenos.N4
-				elseif menu == 1004 then	
 					destination = destination_array.temenos.N3
-				elseif menu == 1003 then	
+				elseif menu == 1006 then
 					destination = destination_array.temenos.N2
-				elseif menu == 1002 then	
+				elseif menu == 1005 then	
 					destination = destination_array.temenos.N1
-				elseif menu == 1001 then	
+				elseif menu == 1004 then	
 					destination = destination_array.temenos.E
 				elseif menu == 1000 then
-					destination = destination_array.temenos.C4
+					destination = destination_array.temenos.C3
 				end
 			end
 		end
@@ -1182,7 +1089,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 2,
             description = 'complete menu'
             })
             return actions
@@ -1236,16 +1143,16 @@ sub_commands = {
 				destination = destination_array.temenos[chest]
 			end 
 
-        if (menu >= 1001 and menu <= 1007) and destination.menu_id ~= 1000 and (destination.menu_id > 1007 or destination.menu_id < 1001) then
+        if (menu >= 1004 and menu <= 1007) and destination.menu_id ~= 1000 and (destination.menu_id > 1007 or destination.menu_id < 1004) then
 				destination = destination_array.temenos.E
         ----------------West Tower--------------------------------------------------------------------------
-        elseif (menu >= 1008 and menu <= 1014) and destination.menu_id ~= 1000 and (destination.menu_id > 1014 or destination.menu_id < 1008) then
+        elseif (menu >= 1011 and menu <= 1014) and destination.menu_id ~= 1000 and (destination.menu_id > 1014 or destination.menu_id < 1011) then
 				destination = destination_array.temenos.E
         ----------------East Tower--------------------------------------------------------------------------
-        elseif (menu >= 1015 and menu <= 1021) and destination.menu_id ~= 1000 and (destination.menu_id > 1021 or destination.menu_id < 1015) then
+        elseif (menu >= 1018 and menu <= 1021) and destination.menu_id ~= 1000 and (destination.menu_id > 1021 or destination.menu_id < 1018) then
 				destination = destination_array.temenos.E
         ----------------Central Tower--------------------------------------------------------------------------
-        elseif (menu >= 1022 and menu <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1022) then
+        elseif (menu >= 1023 and menu <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1023) then
 				destination = destination_array.temenos.E
 		elseif menu == 1026 then -- If we're in CN we only go to entrance.
 			destination = destination_array.temenos.E
@@ -1322,7 +1229,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 2,
             description = 'complete menu'
             })
             return actions
@@ -1377,16 +1284,16 @@ sub_commands = {
 				destination = destination_array.temenos[chest]
 			end 
 
-        if (menu >= 1001 and menu <= 1007) and destination.menu_id ~= 1000 and (destination.menu_id > 1007 or destination.menu_id < 1001) then
+        if (menu >= 1004 and menu <= 1007) and destination.menu_id ~= 1000 and (destination.menu_id > 1007 or destination.menu_id < 1004) then
 				destination = destination_array.temenos.E
         ----------------West Tower--------------------------------------------------------------------------
-        elseif (menu >= 1008 and menu <= 1014) and destination.menu_id ~= 1000 and (destination.menu_id > 1014 or destination.menu_id < 1008) then
+        elseif (menu >= 1011 and menu <= 1014) and destination.menu_id ~= 1000 and (destination.menu_id > 1014 or destination.menu_id < 1011) then
 				destination = destination_array.temenos.E
         ----------------East Tower--------------------------------------------------------------------------
-        elseif (menu >= 1015 and menu <= 1021) and destination.menu_id ~= 1000 and (destination.menu_id > 1021 or destination.menu_id < 1015) then
+        elseif (menu >= 1018 and menu <= 1021) and destination.menu_id ~= 1000 and (destination.menu_id > 1021 or destination.menu_id < 1018) then
 				destination = destination_array.temenos.E
         ----------------Central Tower--------------------------------------------------------------------------
-        elseif (menu >= 1022 and menu <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1022) then
+        elseif (menu >= 1023 and menu <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1023) then
 				destination = destination_array.temenos.E
 		elseif menu == 1026 then -- If we're in CN we only go to entrance.
 			destination = destination_array.temenos.E
@@ -1467,7 +1374,7 @@ sub_commands = {
             packet = packet,
             wait_packet = 0x052,
             expecting_zone = false,
-            delay = 2.5,
+            delay = 2,
             description = 'complete menu'
             })
             return actions
@@ -1548,57 +1455,47 @@ sub_commands = {
     },
     warpdata = T{
         ['Apollyon'] = T{
-			   ['Entrance']  = { shortcut = 'E1' },
-               ['E1'] = {display_name = 'Entrance 1',   zone = 38, menu_id = 102, index = 671, npc = 16933535, offset = 1, x = -608,z = 0, y = -600,h = 126, unknown1 = 1,unknown2 = 1},
-			   ['E2'] = {display_name = 'Entrance 2',   zone = 38, menu_id = 103, index = 672, npc = 16933536, offset = 1, x = 608, z = 0, y = -600,h = 0,unknown1 = 1,  unknown2 = 1},
-			   ['NW1'] = {display_name = 'Northwest 1', zone = 38, menu_id = 104, index = 673, npc = 16933537, offset = 1, x = -440.00003051758, z = 0, y = -88.000007629395, h = 191, unknown1 = 11, unknown2 = 1},
-			   ['NW2'] = {display_name = 'Northwest 2', zone = 38, menu_id = 105, index = 674, npc = 16933538, offset = 2, x = -534,z = 0, y = 171.00001525879,h = 159, unknown1 = 12, unknown2 = 1},
-			   ['NW3'] = {display_name = 'Northwest 3', zone = 38, menu_id = 106, index = 675, npc = 16933540, offset = 3, x = -294,z = 0, y = 171.00001525879,h = 159, unknown1 = 13, unknown2 = 1},
-			   ['NW4'] = {display_name = 'Northwest 4', zone = 38, menu_id = 107, index = 676, npc = 16933539, offset = 4, x = -628,z = 0, y = 497.00003051758,h = 223, unknown1 = 14, unknown2 = 1},
-			   ['NW5'] = {display_name = 'Northwest 5', zone = 38, menu_id = 108, index = 677, npc = 16933542, offset = 5, x = -388,z = 0, y = 498.00003051758,h = 223, unknown1 = 15, unknown2 = 1},
-			   ['SW1'] = {display_name = 'Southwest 1', zone = 38, menu_id = 109, index = 678, npc = 16933541, offset = 3, x = -468.00003051758, z = 0, y = -625,h = 223, unknown1 = 21, unknown2 = 1},
-			   ['SW2'] = {display_name = 'Southwest 2', zone = 38, menu_id = 110, index = 679, npc = 16933543, offset = 4, x = -576,z = 0, y = -428.00003051758, h = 159, unknown1 = 22, unknown2 = 1},
-			   ['SW3'] = {display_name = 'Southwest 3', zone = 38, menu_id = 111, index = 680, npc = 16933544, offset = 0, x = -428.00003051758, z = 0, y = -385.00003051758, h = 223, unknown1 = 23, unknown2 = 1},
-			   ['SW4'] = {display_name = 'Southwest 4', zone = 38, menu_id = 112, index = 681, npc = 16933545, offset = 5, x = -176.00001525879, z = 0, y = -628,h = 159, unknown1 = 24, unknown2 = 1},
-			   ['NE1'] = {display_name = 'Northeast 1', zone = 38, menu_id = 113, index = 682, npc = 16933546, offset = 9, x = 440.00003051758,  z = 0, y = -88.000007629395, h = 191, unknown1 = 31, unknown2 = 1},
-			   ['NE2'] = {display_name = 'Northeast 2', zone = 38, menu_id = 114, index = 683, npc = 16933547, offset = 10,x = 534,z = 0, y = 171.00001525879,h = 223, unknown1 = 32, unknown2 = 1},
-			   ['NE3'] = {display_name = 'Northeast 3', zone = 38, menu_id = 115, index = 684, npc = 16933548, offset = 10,x = 294,z = 0, y = 171.00001525879,h = 223, unknown1 = 33, unknown2 = 1},
-			   ['NE4'] = {display_name = 'Northeast 4', zone = 38, menu_id = 116, index = 685, npc = 16933549, offset = 1, x = 628,z = 0, y = 497.00003051758,h = 159, unknown1 = 34, unknown2 = 1},
-			   ['NE5'] = {display_name = 'Northeast 5', zone = 38, menu_id = 117, index = 686, npc = 16933550, offset = 2, x = 388.00003051758,  z = 0, y = 498.00003051758,  h = 159, unknown1 = 35, unknown2 = 1},
-			   ['SE1'] = {display_name = 'Southeast 1', zone = 38, menu_id = 118, index = 687, npc = 16933551, offset = 5, x = 468.00003051758,  z = 0, y = -625,h = 159, unknown1 = 41, unknown2 = 1},
-			   ['SE2'] = {display_name = 'Southeast 2', zone = 38, menu_id = 119, index = 688, npc = 16933552, offset = 6, x = 576,z = 0, y = -428.00003051758, h = 223, unknown1 = 42, unknown2 = 1},
-			   ['SE3'] = {display_name = 'Southeast 3', zone = 38, menu_id = 120, index = 689, npc = 16933553, offset = 7, x = 428.00003051758,  z = 0, y = -385.00003051758, h = 159, unknown1 = 43, unknown2 = 1},
-			   ['SE4'] = {display_name = 'Southeast 4', zone = 38, menu_id = 121, index = 690, npc = 16933554, offset = 8, x = 176.00001525879,  z = 0, y = -628,h = 223, unknown1 = 44, unknown2 = 1},
-			   ['CN'] = {display_name = 'Apollyon CN',  zone = 38, menu_id = 123, index = 691, npc = 16933555, offset = 8, x = 0,  z = 0, y = 196.00001525879,h = 63, unknown1 = 51, unknown2 = 1},
+			['Entrance']  = { shortcut = 'E1' },
+			['E1']  = {display_name = 'Entrance 1', zone = 38, menu_id = 102,  index = 678, npc = 16933542, offset = 1, x = -608,z = 0, y = -600,h = 126, unknown1 = 1,  unknown2 = 1},
+			['E2']  = {display_name = 'Entrance 2', zone = 38, menu_id = 103,  index = 679, npc = 169335543, offset = 1, x = 608,z = 0, y = -600,h = 0,   unknown1 = 1,  unknown2 = 1},
+			['NW1'] = {display_name = 'Northwest 1', zone = 38, menu_id = 104,  index = 680, npc = 16933544, offset = 1, x = -440.00003051758, z = 0, y = -88.000007629395,  h = 191, unknown1 = 11, unknown2 = 1},
+			['NW2'] = {display_name = 'Northwest 2', zone = 38, menu_id = 105,  index = 681, npc = 16933545, offset = 2, x = -534,z = 0, y = 171.00001525879,h = 159, unknown1 = 12, unknown2 = 1},
+			['NW3'] = {display_name = 'Northwest 3', zone = 38, menu_id = 106,  index = 682, npc = 16933546, offset = 3, x = -294,z = 0, y = 171.00001525879,h = 159, unknown1 = 13, unknown2 = 1},
+			['NW4'] = {display_name = 'Northwest 4', zone = 38, menu_id = 107,  index = 683, npc = 16933547, offset = 4, x = -628,z = 0, y = 497.00003051758,h = 223, unknown1 = 14, unknown2 = 1},
+			['NW5'] = {display_name = 'Northwest 5', zone = 38, menu_id = 108,  index = 684, npc = 16933548, offset = 5, x = -388,z = 0, y = 498.00003051758,h = 223, unknown1 = 15, unknown2 = 1},
+			['SW1'] = {display_name = 'Southwest 1', zone = 38, menu_id = 109,  index = 685, npc = 16933549, offset = 3, x = -468.00003051758, z = 0, y = -625,h = 223, unknown1 = 21, unknown2 = 1},
+			['SW2'] = {display_name = 'Southwest 2', zone = 38, menu_id = 110,  index = 686, npc = 16933550, offset = 4, x = -576,z = 0, y = -428.00003051758,  h = 159, unknown1 = 22, unknown2 = 1},
+			['SW3'] = {display_name = 'Southwest 3', zone = 38, menu_id = 111,  index = 687, npc = 16933551, offset = 0, x = -428.00003051758, z = 0, y = -385.00003051758,  h = 223, unknown1 = 23, unknown2 = 1},
+			['SW4'] = {display_name = 'Southwest 4', zone = 38, menu_id = 112,  index = 688, npc = 16933552, offset = 5, x = -176.00001525879, z = 0, y = -628,h = 159, unknown1 = 24, unknown2 = 1},
+			['NE1'] = {display_name = 'Northeast 1', zone = 38, menu_id = 113,  index = 689, npc = 16933553, offset = 9, x = 440.00003051758,  z = 0, y = -88.000007629395,  h = 191, unknown1 = 31, unknown2 = 1},
+			['NE2'] = {display_name = 'Northeast 2', zone = 38, menu_id = 114,  index = 690, npc = 16933554, offset = 10,x = 534,z = 0, y = 171.00001525879,h = 223, unknown1 = 32, unknown2 = 1},
+			['NE3'] = {display_name = 'Northeast 3', zone = 38, menu_id = 115,  index = 691, npc = 16933555, offset = 10,x = 294,z = 0, y = 171.00001525879,h = 223, unknown1 = 33, unknown2 = 1},
+			['NE4'] = {display_name = 'Northeast 4', zone = 38, menu_id = 116,  index = 692, npc = 16933556, offset = 1, x = 628,z = 0, y = 497.00003051758,h = 159, unknown1 = 34, unknown2 = 1},
+			['NE5'] = {display_name = 'Northeast 5', zone = 38, menu_id = 117,  index = 693, npc = 16933557, offset = 2, x = 388.00003051758,  z = 0, y = 498.00003051758,h = 159, unknown1 = 35, unknown2 = 1},
+			['SE1'] = {display_name = 'Southeast 1', zone = 38, menu_id = 118,  index = 694, npc = 16933558, offset = 5, x = 468.00003051758,  z = 0, y = -625,h = 159, unknown1 = 41, unknown2 = 1},
+			['SE2'] = {display_name = 'Southeast 2', zone = 38, menu_id = 119,  index = 695, npc = 16933559, offset = 6, x = 576,z = 0, y = -428.00003051758,  h = 223, unknown1 = 42, unknown2 = 1},
+			['SE3'] = {display_name = 'Southeast 3', zone = 38, menu_id = 120,  index = 696, npc = 16933560, offset = 7, x = 428.00003051758,  z = 0, y = -385.00003051758,  h = 159, unknown1 = 43, unknown2 = 1},
+			['SE4'] = {display_name = 'Southeast 4', zone = 38, menu_id = 121,  index = 697, npc = 16933561, offset = 8, x = 176.00001525879,  z = 0, y = -628,h = 223, unknown1 = 44, unknown2 = 1},
+			['CN'] = {display_name = 'Central Apollyon',  zone = 38, menu_id = 123,  index = 698, npc = 16933562, offset = 8, x = 0,  z = 0, y = 196.00001525879,h = 63, unknown1 = 51, unknown2 = 1},
 		},
         ['Temenos'] = T{  
-			   ['Entrance']  = {display_name = 'Entrance' , zone = 37, menu_id = 1000, index = 795, npc = 16929563, offset = 1, x = 580, z = 0 ,y = 86.000007629395,h = 63,unknown1 = 1 , unknown2 = 1},
-			   ['N1'] = {display_name = 'Northern Tower 1', zone = 37, menu_id = 1001, index = 853, npc = 16929621, offset = 1, x = 380.00003051758,z = 71.620002746582 ,y = 376.00003051758,h = 191,unknown1 = 11,unknown2 = 1},
-			   ['N2'] = {display_name = 'Northern Tower 2', zone = 37, menu_id = 1002, index = 854, npc = 16929622, offset = 2, x = 180.00001525879,z = -82.380004882812,y = 376.00003051758,h = 191,unknown1 = 12,unknown2 = 1},
-			   ['N3'] = {display_name = 'Northern Tower 3', zone = 37, menu_id = 1003, index = 855, npc = 16929623, offset = 3, x = 60.000003814697,z = 71.620002746582 ,y = 376.00003051758,h = 191,unknown1 = 13,unknown2 = 1},
-			   ['N4'] = {display_name = 'Northern Tower 4', zone = 37, menu_id = 1004, index = 856, npc = 16929624, offset = 4, x = -140,z = -82.380004882812 ,y = 376.00003051758,h = 191, unknown1 = 14,unknown2 = 1},
-			   ['N5'] = {display_name = 'Northern Tower 5', zone = 37, menu_id = 1005, index = 857, npc = 16929625, offset = 5, x = -260,z = 77.620002746582 , y = 376.00003051758,h = 191, unknown1 = 15, unknown2 = 1},
-			   ['N6'] = {display_name = 'Northern Tower 6', zone = 37, menu_id = 1006, index = 858, npc = 16929626, offset = 1, x = -460.00003051758,z = -82.380004882812 ,y = 376.00003051758,h = 191,unknown1 = 16,unknown2 = 1},
-			   ['N7'] = {display_name = 'Northern Tower 7', zone = 37, menu_id = 1007, index = 859, npc = 16929627, offset = 2, x = -580,z = 77.620002746582 , y = 376.00003051758,h = 191, unknown1 = 17, unknown2 = 1},
-			   ['W1'] = {display_name = 'Western Tower 1',  zone = 37, menu_id = 1008, index = 860, npc = 16929628, offset = 3, x = 380.00003051758,z = -2.3800001144409 ,y = 96.000007629395,h = 191, unknown1 = 21, unknown2 = 1},
-			   ['W2'] = {display_name = 'Western Tower 2',  zone = 37, menu_id = 1009, index = 861, npc = 16929629, offset = 4, x = 180.00001525879,z = -162.38000488281 ,y = 96.000007629395,h = 191, unknown1 = 22, unknown2 = 1},
-			   ['W3'] = {display_name = 'Western Tower 3',  zone = 37, menu_id = 1010, index = 862, npc = 16929630, offset = 0, x = 60.000003814697,z = -2.3800001144409 ,y = 96.000007629395,h = 191, unknown1 = 23, unknown2 = 1},
-			   ['W4'] = {display_name = 'Western Tower 4',  zone = 37, menu_id = 1011, index = 863, npc = 16929631, offset = 5, x = -140,z = -162.38000488281 ,y = 96.000007629395,h = 191, unknown1 = 24, unknown2 = 1},
-			   ['W5'] = {display_name = 'Western Tower 5',  zone = 37, menu_id = 1012, index = 864, npc = 16929632, offset = 6, x = -260,z = -2.3800001144409 ,y = 96.000007629395,h = 191, unknown1 = 25, unknown2 = 1},
-			   ['W6'] = {display_name = 'Western Tower 6',  zone = 37, menu_id = 1013, index = 865, npc = 16929633, offset = 7, x = -460.00003051758, z = -162.38000488281 ,y = 96.000007629395,   h = 191, unknown1 = 26, unknown2 = 1},
-			   ['W7'] = {display_name = 'Western Tower 7',  zone = 37, menu_id = 1014, index = 866, npc = 16929634, offset = 8, x = -580,z = -2.3800001144409, y = 96.000007629395,   h = 191, unknown1 = 27, unknown2 = 1},
-			   ['E1'] = {display_name = 'Eastern Tower 1',  zone = 37, menu_id = 1015, index = 867, npc = 16929635, offset = 9, x = 380.00003051758,z = 71.620002746582,y = -184.00001525879,h = 191, unknown1 = 31, unknown2 = 1},
-			   ['E2'] = {display_name = 'Eastern Tower 2',  zone = 37, menu_id = 1016, index = 868, npc = 16929636, offset = 10,x = 180.00001525879,z = -82.380004882812,y = -184.00001525879,h = 191, unknown1 = 32, unknown2 = 1},
-			   ['E3'] = {display_name = 'Eastern Tower 3',  zone = 37, menu_id = 1017, index = 869, npc = 16929637, offset = 10,x = 60.000003814697,z = 71.620002746582,y = -184.00001525879,h = 191, unknown1 = 33, unknown2 = 1},
-			   ['E4'] = {display_name = 'Eastern Tower 4',  zone = 37, menu_id = 1018, index = 870, npc = 16929638, offset = 1, x = -140,z = -82.380004882812, y = -184.00001525879,h = 191, unknown1 = 34, unknown2 = 1},
-			   ['E5'] = {display_name = 'Eastern Tower 5',  zone = 37, menu_id = 1019, index = 871, npc = 16929639, offset = 2, x = -260,z = 77.620002746582,  y = -184.00001525879,h = 191, unknown1 = 35, unknown2 = 1},
-			   ['E6'] = {display_name = 'Eastern Tower 6',  zone = 37, menu_id = 1020, index = 872, npc = 16929640, offset = 3, x = -460.00003051758, z = -82.380004882812, y = -184.00001525879,  h = 191, unknown1 = 36, unknown2 = 1},
-			   ['E7'] = {display_name = 'Eastern Tower 7',  zone = 37, menu_id = 1021, index = 873, npc = 16929642, offset = 4, x = -580,z = 77.620002746582,  y = -184.00001525879,h = 191, unknown1 = 37, unknown2 = 1},
-			   ['C1'] = {display_name = 'Central Tower 1',  zone = 37, menu_id = 1022, index = 874, npc = 16929641, offset = 5, x = 580, z = -2.3800001144409, y = -544, h = 191, unknown1 = 41, unknown2 = 1},
-			   ['C2'] = {display_name = 'Central Tower 2',  zone = 37, menu_id = 1023, index = 875, npc = 16929643, offset = 6, x = 260, z = -162.38000488281, y = -504.00003051758,h = 191, unknown1 = 42, unknown2 = 1},
-			   ['C3'] = {display_name = 'Central Tower 3',  zone = 37, menu_id = 1024, index = 876, npc = 16929644, offset = 7, x = 20,  z = -2.3800001144409, y = -544, h = 191, unknown1 = 43, unknown2 = 1},
-			   ['C4'] = {display_name = 'Central Tower 4',  zone = 37, menu_id = 1025, index = 877, npc = 16929645, offset = 8, x = -296,z = -162.38000488281, y = -500.00003051758,h = 127, unknown1 = 44, unknown2 = 1},
-			   ['CN'] = {display_name = 'Temenos CN',       zone = 37, menu_id = 1026, index = 878, npc = 16929646, offset = 8, x = -540,z = -2.3800001144409, y = -584,  h = 191, unknown1 = 51, unknown2 = 1},   
+			['Entrance'] = {display_name = 'Entrance' ,        zone = 37, menu_id = 1000, index = 510, npc = 16929278, offset = 1, x = 580, z = 0 ,  y = 86.000007629395,   h = 63,  unknown1 = 1 , unknown2 = 1},
+			['N1'] = {display_name = 'Northern Tower 1', zone = 37, menu_id = 1004, index = 571, npc = 16929339, offset = 1, x = -140,z = -82.380004882812 ,y = 376.00003051758,   h = 191, unknown1 = 11 ,unknown2 = 1},
+			['N2'] = {display_name = 'Northern Tower 2', zone = 37, menu_id = 1005, index = 572, npc = 16929340, offset = 2, x = -260,z = 77.620002746582 , y = 376.00003051758, h = 191, unknown1 = 12 ,unknown2 = 1},
+			['N3'] = {display_name = 'Northern Tower 3', zone = 37, menu_id = 1006, index = 573, npc = 16929341, offset = 3, x = -460.00003051758, z = -82.380004882812 ,y = 376.00003051758,   h = 191, unknown1 = 13 ,unknown2 = 1},
+			['N4'] = {display_name = 'Northern Tower 4', zone = 37, menu_id = 1007, index = 574, npc = 16929342, offset = 4, x = -580,z = 77.620002746582 , y = 376.00003051758,   h = 191, unknown1 = 14 ,unknown2 = 1},
+			['W1'] = {display_name = 'Western Tower 1',  zone = 37, menu_id = 1011, index = 578, npc = 16929346, offset = 3, x = -140,z = -162.38000488281 ,y = 96.000007629395,                h = 191, unknown1 = 21, unknown2 = 1},
+			['W2'] = {display_name = 'Western Tower 2',  zone = 37, menu_id = 1012, index = 579, npc = 16929347, offset = 4, x = -260,z = -2.3800001144409 ,y = 96.000007629395,                h = 191, unknown1 = 22, unknown2 = 1},
+			['W3'] = {display_name = 'Western Tower 3',  zone = 37, menu_id = 1013, index = 580, npc = 16929348, offset = 0, x = -460.00003051758, z = -162.38000488281 ,y = 96.000007629395,   h = 191, unknown1 = 23, unknown2 = 1},
+			['W4'] = {display_name = 'Western Tower 4',  zone = 37, menu_id = 1014, index = 581, npc = 16929349, offset = 5, x = -580,z = -2.3800001144409, y = 96.000007629395,                h = 191, unknown1 = 24, unknown2 = 1},
+			['E1'] = {display_name = 'Eastern Tower 1',  zone = 37, menu_id = 1018, index = 585, npc = 16929353, offset = 9,  x = -140,z = -82.380004882812, y = -184.00001525879,               h = 191, unknown1 = 31, unknown2 = 1},
+			['E2'] = {display_name = 'Eastern Tower 2',  zone = 37, menu_id = 1019, index = 586, npc = 16929354, offset = 10, x = -260,z = 77.620002746582,  y = -184.00001525879,               h = 191, unknown1 = 32, unknown2 = 1},
+			['E3'] = {display_name = 'Eastern Tower 3',  zone = 37, menu_id = 1020, index = 587, npc = 16929355, offset = 10, x = -460.00003051758, z = -82.380004882812, y = -184.00001525879,  h = 191, unknown1 = 33, unknown2 = 1},
+			['E4'] = {display_name = 'Eastern Tower 4',  zone = 37, menu_id = 1021, index = 588, npc = 16929356, offset = 1,  x = -580,z = 77.620002746582,   y = -184.00001525879,              h = 191, unknown1 = 34, unknown2 = 1},
+			['C1'] = {display_name = 'Central Tower 1',  zone = 37, menu_id = 1023, index = 590, npc = 16929358, offset = 5, x = 260, z = -162.38000488281, y = -504.00003051758,  h = 191, unknown1 = 41, unknown2 = 1},
+			['C2'] = {display_name = 'Central Tower 2',  zone = 37, menu_id = 1024, index = 591, npc = 16929359, offset = 6, x = 20,  z = -2.3800001144409, y = -544,              h = 191, unknown1 = 42, unknown2 = 1},
+			['C3'] = {display_name = 'Central Tower 3',  zone = 37, menu_id = 1025, index = 592, npc = 16929360, offset = 7, x = -296,z = -162.38000488281, y = -500.00003051758,  h = 127, unknown1 = 43, unknown2 = 1},
+			['CN'] = {display_name = 'Temenos Central B1',zone = 37, menu_id = 1026, index = 594, npc = 16929361, offset = 8, x = -540,z = -2.3800001144409, y = -584,  h = 191, unknown1 = 51, unknown2 = 1},     
 		},
     },
 }
