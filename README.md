@@ -356,3 +356,6 @@ Thanks to Staticvoid for researching and implementing the Sortie, Odyssey, Temen
 
 #### v1.1.2
 - **Resolved**: Limbus chest ids updated
+
+#### v1.1.3
+- **Resolved**: Limbus map update (major changes, removed floors, floor location changes, chest tracking format update and more.)
