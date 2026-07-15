@@ -47,10 +47,7 @@ _addon.name = 'superwarp'
 
 _addon.author = 'Akaden'
 
-_addon.version = '1.1.3'
-
-_addon.version = '1.1.2'
-
+_addon.version = '1.1.4'
 
 _addon.commands = {'sw','superwarp'}
 
@@ -984,6 +981,10 @@ local function smart_command(best, short_name)
             if maps.abyssea.entry_zones and maps.abyssea.entry_zones:contains(zone_check) then
                 best.interaction = 'enter'
             end
+        elseif best.map_name == 'escha' then
+            if maps.escha.escha_zones and not maps.escha.escha_zones:contains(zone_check)then
+                best.interaction = 'enter'
+            end
         end
     elseif best.map_name == 'limbus' and best.interaction ~= 'exit' then
         if zone_check == 33 then
@@ -1095,7 +1096,6 @@ local function magic_map()
                             end
                         end
                     end
-
                     -- if within range our work is done
                     if best.npc and best.distance and best.distance < max_dist then
                         last_cache.zone = zone_check
@@ -1107,7 +1107,6 @@ local function magic_map()
             end
         end
     end
-    
     -- full scan if cache doesn't do the trick
     for map_name, map in pairs(maps) do
         if map.zone_npc_list and map.npc_names then
@@ -1137,7 +1136,6 @@ local function magic_map()
                                     best.distance = npc.distance
                                     best.npc = npc
                                 end
-
                                 -- if within range our work is done
                                 if best.distance and best.distance < max_dist then
                                     last_cache.zone = zone_check
@@ -1152,13 +1150,11 @@ local function magic_map()
             end
         end
     end
-
     if best.map_name then
         last_cache.zone = zone_check
         last_cache.map_name = best.map_name
         last_cache.interaction = best.interaction
     end
-
     return best
 end
 ---------------------------------------------
@@ -1772,6 +1768,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         end
     end
 end)
+
 windower.register_event('outgoing chunk',function(id,data,modified,injected,blocked)
     if id == 0x01A and not injected and current_activity and not current_activity.canceled then
         log('Wait until the current action has finished. If you are soft-locked  //sw reset ')

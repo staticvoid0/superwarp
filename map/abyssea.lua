@@ -1,13 +1,13 @@
 local warp_zones = S{ 232, 236, 240, 246, 243, 242 } -- ports + ru'lude and heaven's tower
-local entry_zones = S{ 102, 108, 117, 118, 103, 104, 107, 106, 112 } 
+local entry_zones = S{ 102, 108, 117, 118, 103, 104, 107, 106, 112, 126} 
 local teleport_npcs = S{ "Ernst", "Ivan", "Willis", "Horst", "Kierron", "Vincent"}
-local abyssea_zones = S{ 15, 45, 132, 215, 216, 217, 218, 253, 254}
-local all_warp_zones = S{232, 236, 240, 246, 243, 242, 102, 108, 117, 118, 103, 104, 107, 106, 112, 15, 45, 132, 215, 216, 217, 218, 253, 254}
-local aby_menu_ids = S{404,795,873,339,433,10185,107,100,218,61,55,47,914,204,908,200,2132,2133,2134,2135,2136,2137,2138,2139,123}
+local abyssea_zones = S{ 15, 45, 132, 215, 216, 217, 218, 253, 254, 255}
+local all_warp_zones = S{232, 236, 240, 246, 243, 242, 102, 108, 117, 118, 103, 104, 107, 106, 112, 15, 45, 132, 215, 216, 217, 218, 253, 254, 255, 126}
+local aby_menu_ids = S{404,795,873,339,433,10185,107,100,218,61,55,47,914,204,908,200,2132,2133,2134,2135,2136,2137,2138,2139,123,200,46}
 local target_ids = S{17199772,17203935,17212109}
 local npc_names = T{
     warp = S{'Veridical Conflux', 'Ernst', 'Ivan', 'Willis', 'Horst', 'Kierron', 'Vincent'},
-    enter = S{'Cavernous Maw'},
+    enter = S{'Cavernous Maw','Transcendental Radiance'},
     exit = S{'Cavernous Maw'},
 }
 return T{
