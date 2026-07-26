@@ -1,4 +1,5 @@
 local settings = nil
+local climb_unfinished = nil
 local entry_zones = S{33}
 local limbus_zones = S{37,38}
 local npc_names = T{
@@ -55,6 +56,79 @@ local npc_names = T{
 	   CN = {display_name = 'Temenos Central B1',zone = 37, menu_id = 1026, index = 594, npc = 16929361, offset = 8, x = -540,z = -2.3800001144409, y = -584,  h = 191, unknown1 = 51, unknown2 = 1},   
          }
 	}
+---------------------------
+local apollyon_towers = {
+    cn = {
+        [123] = true,
+    },
+    southeast = {
+        [118] = true,
+        [119] = true,
+        [120] = true,
+        [121] = true,
+    },
+
+    northeast = {
+        [113] = true,
+        [114] = true,
+        [115] = true,
+        [116] = true,
+        [117] = true,
+    },
+
+    southwest = {
+        [109] = true,
+        [110] = true,
+        [111] = true,
+        [112] = true,
+    },
+
+    northwest = {
+        [104] = true,
+        [105] = true,
+        [106] = true,
+        [107] = true,
+        [108] = true,
+    },
+}
+local temenos_towers = {
+    cn = {
+        [1026] = true,
+    },
+    central = {
+        [1023] = true,
+        [1024] = true,
+        [1025] = true,
+    },
+
+    east = {
+        [1018] = true,
+        [1019] = true,
+        [1020] = true,
+        [1021] = true,
+    },
+
+    west = {
+        [1011] = true,
+        [1012] = true,
+        [1013] = true,
+        [1014] = true,
+    },
+
+    north = {
+        [1004] = true,
+        [1005] = true,
+        [1006] = true,
+        [1007] = true,
+    },
+}
+local function get_tower(menu_id, tower_set)
+    for _, tower in pairs(tower_set) do
+        if tower[menu_id] then
+            return tower
+        end
+    end
+end
 ---------------------------
 local temenos_temp_item_ids = {
    -- North
@@ -246,7 +320,7 @@ return T {
         end)
         return mlist
     end,
-    validate = function(menu_id, zone, current_activity,p,chestdata)
+    validate = function(menu_id, zone, c_a,p,chestdata)
 		if chestdata == nil then
 			return 'Please update your superwarp.lua file to version 1.0.5 or later for Limbus support.'
 		end
@@ -259,11 +333,12 @@ return T {
 		local cross_tower_checkinator = nil
 		local current_floor_checkinator = nil
 		local CN_check = nil
-        if current_activity.sub_cmd == 'port' or current_activity.sub_cmd == 'next' or current_activity.sub_cmd == 'back' or current_activity.sub_cmd == 'random' then
+        if c_a.sub_cmd == 'port' or c_a.sub_cmd == 'next' or c_a.sub_cmd == 'back' or c_a.sub_cmd == 'random' then
             destination = nil
         else
-            destination = current_activity.activity_settings
+            destination = c_a.activity_settings
         end
+
 		--====== CN ======
 		if destination and (destination.menu_id == 123 or destination.menu_id == 1026) then
 			if menu_id ~= 102 and menu_id ~= 103 and menu_id ~= 1000 then
@@ -278,192 +353,166 @@ return T {
         --------------------------------------------------------------------------------------------------------------------------------------------
         --  Apollyon
         --------------------------------------------------------------------------------------------------------------------------------------------
-		if current_activity.sub_cmd == 'enter' and zone ~= 33 and menu_id ~= 159 and menu_id ~= 160 then
+		if c_a.sub_cmd == 'enter' and zone ~= 33 and menu_id ~= 159 and menu_id ~= 160 then
 			return "You cannot use the enter command here."
 		end
-		if current_activity.sub_cmd == 'exit' and zone ~= 38 and menu_id ~= 100 and menu_id ~= 101 then
+		if c_a.sub_cmd == 'exit' and zone ~= 38 and menu_id ~= 100 and menu_id ~= 101 then
 			return "These aren't the droids you're looking for."
 		end
 if zone == 38 then
-        if not (current_activity.sub_cmd == 'enter' or current_activity.sub_cmd == 'exit') and
+        if not (c_a.sub_cmd == 'enter' or c_a.sub_cmd == 'exit') and
         not (menu_id >= 102 and menu_id <= 123) then
             return "Incorrect menu detected! Menu ID: " .. menu_id
         end
 		-------------------------------------------------------------------------------------------------------------------------------------------
        -- Destination setters
         -------------------------------------------------------------------------------------------------------------------------------------------
-		if current_activity.sub_cmd == 'next' then
+		if c_a.sub_cmd == 'next' then
 			if _apollyon_floor then
-				destination = destination_array.apollyon[_apollyon_floor]
+				current_activity.args = destination_array.apollyon[_apollyon_floor]
 				current_floor_checkinator = true
 				cross_tower_checkinator = true
+				climb_unfinished = true
 			else--if menu_id == 102 or menu_id == 103 then
 				local chest = find_5k_chest(zone)
-				destination = destination_array.apollyon[chest]
+				current_activity.args = destination_array.apollyon[chest]
 				log(chest and 'All data collected. Sending you to '..chest..'.')
-				if menu_id == destination.menu_id then
+				if menu_id == current_activity.args.menu_id then
 					return "Open chest on this floor."
 				end
 				cross_tower_checkinator = true
+				climb_unfinished = false
 			end
-		elseif current_activity.sub_cmd == 'random' then
+		elseif c_a.sub_cmd == 'random' then
 			if _apollyon_shuffle then
-				destination = destination_array.apollyon[_apollyon_shuffle]
+				current_activity.args = destination_array.apollyon[_apollyon_shuffle]
 				current_floor_checkinator = true
 				cross_tower_checkinator = true
+				climb_unfinished = true
 			else
 				local chest = find_5k_chest(zone)
-				destination = destination_array.apollyon[chest]
+				current_activity.args = destination_array.apollyon[chest]
 				log(chest and 'All data collected. Sending you to '..chest..'.')
-				if menu_id == destination.menu_id then
+				if menu_id == current_activity.args.menu_id then
 					return "Open chest on this floor."
 				end
 				cross_tower_checkinator = true
+				climb_unfinished = false
 			end 
 		----------------------------------------------
-		elseif current_activity.sub_cmd == 'port' then
+		elseif c_a.sub_cmd == 'port' then
 			if menu_id >= 102 and menu_id <= 111 then
 				if menu_id == 102 or menu_id == 103 then
-					destination = destination_array.apollyon.NW1
+					current_activity.args = destination_array.apollyon.NW1
 				elseif menu_id == 104 then
-					destination = destination_array.apollyon.NW2
+					current_activity.args = destination_array.apollyon.NW2
 				elseif menu_id == 105 then
-					destination = destination_array.apollyon.NW3
+					current_activity.args = destination_array.apollyon.NW3
 				elseif menu_id == 106 then
-					destination = destination_array.apollyon.NW4
+					current_activity.args = destination_array.apollyon.NW4
 				elseif menu_id == 107 then
-					destination = destination_array.apollyon.NW5
+					current_activity.args = destination_array.apollyon.NW5
 				elseif menu_id == 108 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				elseif menu_id == 109 then
-					destination = destination_array.apollyon.SW2
+					current_activity.args = destination_array.apollyon.SW2
 				elseif menu_id == 110 then
-					destination = destination_array.apollyon.SW3
+					current_activity.args = destination_array.apollyon.SW3
 				elseif menu_id == 111 then
-					destination = destination_array.apollyon.SW4
+					current_activity.args = destination_array.apollyon.SW4
 				end
 			elseif menu_id >= 112 and menu_id <= 123 then
 				if menu_id == 112 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				elseif menu_id == 113 then
-					destination = destination_array.apollyon.NE2
+					current_activity.args = destination_array.apollyon.NE2
 				elseif menu_id == 114 then
-					destination = destination_array.apollyon.NE3
+					current_activity.args = destination_array.apollyon.NE3
 				elseif menu_id == 115 then
-					destination = destination_array.apollyon.NE4
+					current_activity.args = destination_array.apollyon.NE4
 				elseif menu_id == 116 then
-					destination = destination_array.apollyon.NE5
+					current_activity.args = destination_array.apollyon.NE5
 				elseif menu_id == 117 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				elseif menu_id == 118 then
-					destination = destination_array.apollyon.SE2
+					current_activity.args = destination_array.apollyon.SE2
 				elseif menu_id == 119 then
-					destination = destination_array.apollyon.SE3
+					current_activity.args = destination_array.apollyon.SE3
 				elseif menu_id == 120 then
-					destination = destination_array.apollyon.SE4
+					current_activity.args = destination_array.apollyon.SE4
 				elseif menu_id == 121 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				elseif menu_id == 123 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				end
 			end
-		elseif current_activity.sub_cmd == 'back' then
+		elseif c_a.sub_cmd == 'back' then
 			if menu_id <= 123 and menu_id >= 113 then
 				if menu_id == 123 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				elseif menu_id == 121 then
-					destination = destination_array.apollyon.SE3
+					current_activity.args = destination_array.apollyon.SE3
 				elseif menu_id == 120 then
-					destination = destination_array.apollyon.SE2
+					current_activity.args = destination_array.apollyon.SE2
 				elseif menu_id == 119 then
-					destination = destination_array.apollyon.SE1
+					current_activity.args = destination_array.apollyon.SE1
 				elseif menu_id == 118 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				elseif menu_id == 117 then
-					destination = destination_array.apollyon.NE4
+					current_activity.args = destination_array.apollyon.NE4
 				elseif menu_id == 116 then
-					destination = destination_array.apollyon.NE3
+					current_activity.args = destination_array.apollyon.NE3
 				elseif menu_id == 115 then
-					destination = destination_array.apollyon.NE2
+					current_activity.args = destination_array.apollyon.NE2
 				elseif menu_id == 114 then
-					destination = destination_array.apollyon.NE1
+					current_activity.args = destination_array.apollyon.NE1
 				elseif menu_id == 113 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				end
 			elseif menu_id <= 112 and menu_id >= 102 then
 				if menu_id == 112 then
-					destination = destination_array.apollyon.SW3
+					current_activity.args = destination_array.apollyon.SW3
 				elseif menu_id == 111 then
-					destination = destination_array.apollyon.SW2
+					current_activity.args = destination_array.apollyon.SW2
 				elseif menu_id == 110 then
-					destination = destination_array.apollyon.SW1
+					current_activity.args = destination_array.apollyon.SW1
 				elseif menu_id == 109 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				elseif menu_id == 108 then
-					destination = destination_array.apollyon.NW4
+					current_activity.args = destination_array.apollyon.NW4
 				elseif menu_id == 107 then
-					destination = destination_array.apollyon.NW3
+					current_activity.args = destination_array.apollyon.NW3
 				elseif menu_id == 106 then
-					destination = destination_array.apollyon.NW2
+					current_activity.args = destination_array.apollyon.NW2
 				elseif menu_id == 105 then
-					destination = destination_array.apollyon.NW1
+					current_activity.args = destination_array.apollyon.NW1
 				elseif menu_id == 104 then
-					destination = destination_array.apollyon.E1
+					current_activity.args = destination_array.apollyon.E1
 				elseif menu_id == 103 or menu_id == 102 then
-					destination = destination_array.apollyon.SE4
+					current_activity.args = destination_array.apollyon.SE4
 				end
 			end
 		end
+		if c_a.sub_cmd then 
+			destination = current_activity.args 
+		end
 -----------------------------------------------------------------------------------------------------------
-	if current_activity.sub_cmd ~= 'exit' and current_activity.sub_cmd ~= 'enter' then
+	if c_a.sub_cmd ~= 'exit' and c_a.sub_cmd ~= 'enter' then
 		---------------------------------------------------------------------------------------------------
-        -- prevent warping between towers / next command cross-tower destination entrance override
-        ----------------Northwest--------------------------------------------------------------------------
-        if (menu_id >= 104 and menu_id <= 108) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 108 or destination.menu_id < 104) then
-			if cross_tower_checkinator then 
+        -- Cross-tower prevention / next command cross-tower destination override
+		local current_tower = get_tower(menu_id, apollyon_towers)
+		if current_tower and destination.menu_id ~= 102 and destination.menu_id ~= 103 and not current_tower[destination.menu_id] then
+			if cross_tower_checkinator then
 				cross_tower_checkinator = nil
-				destination = destination_array.apollyon.E1
-			else
-				return 'Cannot warp to other towers from here.'
-			end
-        end
-        ----------------Southwest--------------------------------------------------------------------------
-        if (menu_id >= 109 and menu_id <= 112) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 112 or destination.menu_id < 109) then
-			if cross_tower_checkinator then 
-				cross_tower_checkinator = nil
-				destination = destination_array.apollyon.E1
-			else
-				return 'Cannot warp to other towers from here.'
-			end
-        end
-        ----------------Northeast--------------------------------------------------------------------------
-        if (menu_id >= 113 and menu_id <= 117) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 117 or destination.menu_id < 113) then
-			if cross_tower_checkinator then 
-				cross_tower_checkinator = nil
-				destination = destination_array.apollyon.E1
-			else
-				return 'Cannot warp to other towers from here.'
-			end
-        end
-        ----------------Southeast--------------------------------------------------------------------------
-        if (menu_id >= 118 and menu_id <= 121) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 121 or destination.menu_id < 118) then
-			if cross_tower_checkinator then 
-				cross_tower_checkinator = nil
-				destination = destination_array.apollyon.E1
-			else
-				return 'Cannot warp to other towers from here.'
-			end
-        end
-		---- CN Cross-tower prevention
-		if menu_id == 123 and destination.menu_id ~= 102 and destination.menu_id ~= 103 then
-			if cross_tower_checkinator then 
-				cross_tower_checkinator = nil
-				destination = destination_array.apollyon.E1
+				current_activity.args = destination_array.apollyon.E1
 			else
 				return 'Cannot warp to other towers from here.'
 			end
 		end
     end
+		if current_activity.args then
+			destination = current_activity.args
+		end
 		--------------------------------------------------------------------------------------------------------------------------------------------   
 		 --  Temenos
         --------------------------------------------------------------------------------------------------------------------------------------------
@@ -471,179 +520,153 @@ elseif zone == 37 then
 		-------------------------------------------------------------------------------------------------------------------------------------------
        -- Destination setters
         -------------------------------------------------------------------------------------------------------------------------------------------
-		if current_activity.sub_cmd == 'next' then
+		if c_a.sub_cmd == 'next' then
 			if _temenos_floor then
-				destination = destination_array.temenos[_temenos_floor]
+				current_activity.args = destination_array.temenos[_temenos_floor]
 				current_floor_checkinator = true
 				cross_tower_checkinator = true
+				climb_unfinished = true
 			else
 				local chest = find_5k_chest(zone)
-				destination = destination_array.temenos[chest]
+				current_activity.args = destination_array.temenos[chest]
 				log(chest and 'All data collected. Sending you to '..chest..'.')
 				cross_tower_checkinator = true
-				if menu_id == destination.menu_id then
+				climb_unfinished = false
+				if menu_id == current_activity.args.menu_id then
 					return "Open chest on this floor."
 				end
 			end
-		elseif current_activity.sub_cmd == 'random' then
+		elseif c_a.sub_cmd == 'random' then
 			if _temenos_shuffle then
-				destination = destination_array.temenos[_temenos_shuffle]
+				current_activity.args = destination_array.temenos[_temenos_shuffle]
 				current_floor_checkinator = true
 				cross_tower_checkinator = true
+				climb_unfinished = true
 			else
 				local chest = find_5k_chest(zone)
-				destination = destination_array.temenos[chest]
+				current_activity.args = destination_array.temenos[chest]
 				log(chest and 'All data collected. Sending you to '..chest..'.')
 				cross_tower_checkinator = true
-				if menu_id == destination.menu_id then
+				climb_unfinished = false
+				if menu_id == current_activity.args.menu_id then
 					return "Open chest on this floor."
 				end
 			end
-		elseif current_activity.sub_cmd == 'port' then
+		elseif c_a.sub_cmd == 'port' then
 			if menu_id == 1000 or (menu_id >= 1004 and menu_id <= 1007) then
 				if menu_id == 1000 then
-					destination = destination_array.temenos.N1
+					current_activity.args = destination_array.temenos.N1
 				elseif menu_id == 1004 then
-					destination = destination_array.temenos.N2
+					current_activity.args = destination_array.temenos.N2
 				elseif menu_id == 1005 then
-					destination = destination_array.temenos.N3
+					current_activity.args = destination_array.temenos.N3
 				elseif menu_id == 1006 then
-					destination = destination_array.temenos.N4
+					current_activity.args = destination_array.temenos.N4
 				elseif menu_id == 1007 then
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				end
 			elseif menu_id >= 1011 and menu_id <= 1014 then
 				if menu_id == 1011 then
-					destination = destination_array.temenos.W2
+					current_activity.args = destination_array.temenos.W2
 				elseif menu_id == 1012 then
-					destination = destination_array.temenos.W3
+					current_activity.args = destination_array.temenos.W3
 				elseif menu_id == 1013 then
-					destination = destination_array.temenos.W4
+					current_activity.args = destination_array.temenos.W4
 				elseif menu_id == 1014 then
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				end
 			elseif menu_id >= 1018 and menu_id <= 1021 then
 				if menu_id == 1018 then
-					destination = destination_array.temenos.E2
+					current_activity.args = destination_array.temenos.E2
 				elseif menu_id == 1019 then
-					destination = destination_array.temenos.E3
+					current_activity.args = destination_array.temenos.E3
 				elseif menu_id == 1020 then
-					destination = destination_array.temenos.E4
+					current_activity.args = destination_array.temenos.E4
 				elseif menu_id == 1021 then
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				end
 			elseif menu_id >= 1023 and menu_id <= 1026 then
 				if menu_id == 1023 then
-					destination = destination_array.temenos.C2
+					current_activity.args = destination_array.temenos.C2
 				elseif menu_id == 1024 then
-					destination = destination_array.temenos.C3
+					current_activity.args = destination_array.temenos.C3
 				elseif menu_id == 1025 then
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				elseif menu_id == 1026 then
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				end
 			end
-		elseif current_activity.sub_cmd == 'back' then
+		elseif c_a.sub_cmd == 'back' then
 			if menu_id <= 1026 and menu_id >= 1023 then
 				if menu_id == 1026 then
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				elseif menu_id == 1025 then
-					destination = destination_array.temenos.C2
+					current_activity.args = destination_array.temenos.C2
 				elseif menu_id == 1024 then
-					destination = destination_array.temenos.C1
+					current_activity.args = destination_array.temenos.C1
 				elseif menu_id == 1023 then
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				end
 			elseif menu_id <= 1021 and menu_id >= 1018 then
 				if menu_id == 1021 then
-					destination = destination_array.temenos.E3
+					current_activity.args = destination_array.temenos.E3
 				elseif menu_id == 1020 then
-					destination = destination_array.temenos.E2
+					current_activity.args = destination_array.temenos.E2
 				elseif menu_id == 1019 then
-					destination = destination_array.temenos.E1
+					current_activity.args = destination_array.temenos.E1
 				elseif menu_id == 1018 then
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				end
 			elseif menu_id <= 1014 and menu_id >= 1011 then
 				if menu_id == 1014 then
-					destination = destination_array.temenos.W3
+					current_activity.args = destination_array.temenos.W3
 				elseif menu_id == 1013 then
-					destination = destination_array.temenos.W2
+					current_activity.args = destination_array.temenos.W2
 				elseif menu_id == 1012 then
-					destination = destination_array.temenos.W1
+					current_activity.args = destination_array.temenos.W1
 				elseif menu_id == 1011 then
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				end
 			elseif (menu_id <= 1007 and menu_id >= 1004) or menu_id == 1000 then
 				if menu_id == 1007 then
-					destination = destination_array.temenos.N3
+					current_activity.args = destination_array.temenos.N3
 				elseif menu_id == 1006 then
-					destination = destination_array.temenos.N2
+					current_activity.args = destination_array.temenos.N2
 				elseif menu_id == 1005 then	
-					destination = destination_array.temenos.N1
+					current_activity.args = destination_array.temenos.N1
 				elseif menu_id == 1004 then	
-					destination = destination_array.temenos.E
+					current_activity.args = destination_array.temenos.E
 				elseif menu_id == 1000 then
-					destination = destination_array.temenos.C3
+					current_activity.args = destination_array.temenos.C3
 				end
 			end
+		end
+		if c_a.sub_cmd then
+			destination = current_activity.args
 		end
 -------------------------------------------
         if not
         (menu_id >= 1000 and menu_id <= 1026) then
             return "Incorrect menu detected! Menu ID: " .. menu_id
         end
-        -- prevent warping between towers / next command cross-tower destination entrance override
-        ----------------North Tower--------------------------------------------------------------------------
-        if (menu_id >= 1004 and menu_id <= 1007) and destination.menu_id ~= 1000 and (destination.menu_id > 1007 or destination.menu_id < 1004) then
-			if cross_tower_checkinator then 
-				cross_tower_checkinator = nil
-				destination = destination_array.temenos.E
-			else
-				return 'Cannot warp to other towers from here.'
-			end
-        end
-        ----------------West Tower--------------------------------------------------------------------------
-        if (menu_id >= 1011 and menu_id <= 1014) and destination.menu_id ~= 1000 and (destination.menu_id > 1014 or destination.menu_id < 1011) then
-			if cross_tower_checkinator then 
-				cross_tower_checkinator = nil
-				destination = destination_array.temenos.E
-			else
-				return 'Cannot warp to other towers from here.'
-			end
-        end
-        ----------------East Tower--------------------------------------------------------------------------
-        if (menu_id >= 1018 and menu_id <= 1021) and destination.menu_id ~= 1000 and (destination.menu_id > 1021 or destination.menu_id < 1018) then
-			if cross_tower_checkinator then 
-				cross_tower_checkinator = nil
-				destination = destination_array.temenos.E
-			else
-				return 'Cannot warp to other towers from here.'
-			end
-        end
-        ----------------Central Tower--------------------------------------------------------------------------
-        if (menu_id >= 1023 and menu_id <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1023) then
+        -- Cross-tower prevention / next command cross-tower destination override
+		local current_tower = get_tower(menu_id, temenos_towers)
+		if current_tower and destination.menu_id ~= 1000 and not current_tower[destination.menu_id] then
 			if cross_tower_checkinator then
 				cross_tower_checkinator = nil
-				destination = destination_array.temenos.E
-			else
-				return 'Cannot warp to other towers from here.'
-			end
-        end
-		----CN Cross-tower prevention----
-		if menu_id == 1026 and destination.menu_id ~= 1000 then
-			if cross_tower_checkinator then
-				cross_tower_checkinator = nil
-				destination = destination_array.temenos.E
+				current_activity.args = destination_array.temenos.E
 			else
 				return 'Cannot warp to other towers from here.'
 			end
 		end
 end
-	if current_activity.sub_cmd ~= 'exit' and current_activity.sub_cmd ~= 'enter' then
+	if current_activity.args then
+		destination = current_activity.args
+	end
+	if c_a.sub_cmd ~= 'exit' and c_a.sub_cmd ~= 'enter' then
 		------------Same floor prevention / data check warp override------------------
         if menu_id == destination.menu_id then
-			if current_floor_checkinator and (current_activity.sub_cmd == 'next' or current_activity.sub_cmd == 'random') then
+			if current_floor_checkinator and (c_a.sub_cmd == 'next' or c_a.sub_cmd == 'random') then
 				current_floor_checkinator = nil
 				return "You still have work to do on this floor."
 			else
@@ -678,13 +701,6 @@ end
         local npc = current_activity.npc
         local destination = current_activity.activity_settings
 
-            -- update request
-            packet = packets.new('outgoing', 0x016)
-            packet["Target Index"] = windower.ffxi.get_player().index
-            actions:append(T {
-                packet = packet,
-                description = 'update request'
-            })
         -- menu change
         packet = packets.new('outgoing', 0x05B)
         packet["Target"] = npc.id
@@ -718,10 +734,10 @@ end
         actions:append(T {
             packet = packet,
             wait_packet = 0x052,
-            delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),
+            delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),-- + 0.5,
             description = 'same-zone move request'
         })
-
+  
         -- complete menu
         packet = packets.new('outgoing', 0x05B)
         packet["Target"] = npc.id
@@ -735,12 +751,20 @@ end
         packet["_unknown2"] = 0
         actions:append(T {
             packet = packet,
-            wait_packet = 0x052,
+            wait_packet = 0x05B,
             expecting_zone = false,
-            delay = 2,
+            delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),
             description = 'complete menu'
         })
 
+        -- update request
+        packet = packets.new('outgoing', 0x016)
+        packet["Target Index"] = windower.ffxi.get_player().index
+        actions:append(T {
+            packet = packet,
+            description = 'update request'
+        })
+      
         return actions
     end,
 sub_commands = {
@@ -749,116 +773,14 @@ sub_commands = {
 		local packet = nil
 		local menu = p["Menu ID"]
 		local npc = current_activity.npc
-		local destination = nil
-    if zone == 38 then
-		if current_activity.sub_cmd == 'port' then
-			if menu >= 102 and menu <= 111 then
-				if menu == 102 or menu == 103 then
-					destination = destination_array.apollyon.NW1
-				elseif menu == 104 then
-					destination = destination_array.apollyon.NW2
-				elseif menu == 105 then
-					destination = destination_array.apollyon.NW3
-				elseif menu == 106 then
-					destination = destination_array.apollyon.NW4
-				elseif menu == 107 then
-					destination = destination_array.apollyon.NW5
-				elseif menu == 108 then
-					destination = destination_array.apollyon.E1
-				elseif menu == 109 then
-					destination = destination_array.apollyon.SW2
-				elseif menu == 110 then
-					destination = destination_array.apollyon.SW3
-				elseif menu == 111 then
-					destination = destination_array.apollyon.SW4
-				end
-			elseif menu >= 112 and menu <= 123 then
-				if menu == 112 then
-					destination = destination_array.apollyon.E1
-				elseif menu == 113 then
-					destination = destination_array.apollyon.NE2
-				elseif menu == 114 then
-					destination = destination_array.apollyon.NE3
-				elseif menu == 115 then
-					destination = destination_array.apollyon.NE4
-				elseif menu == 116 then
-					destination = destination_array.apollyon.NE5
-				elseif menu == 117 then
-					destination = destination_array.apollyon.E1
-				elseif menu == 118 then
-					destination = destination_array.apollyon.SE2
-				elseif menu == 119 then
-					destination = destination_array.apollyon.SE3
-				elseif menu == 120 then
-					destination = destination_array.apollyon.SE4
-				elseif menu == 121 then
-					destination = destination_array.apollyon.E1
-				elseif menu == 123 then
-					destination = destination_array.apollyon.E1
-				end
+		local destination = current_activity.args
+			if zone ~= destination.zone then
+				log('Woa woa woa.')
+				return
 			end
-		end
-    elseif zone == 37 then
-		if current_activity.sub_cmd == 'port' then
-			if menu == 1000 or (menu >= 1004 and menu <= 1007) then
-				if menu == 1000 then
-					destination = destination_array.temenos.N1
-				elseif menu == 1004 then
-					destination = destination_array.temenos.N2
-				elseif menu == 1005 then
-					destination = destination_array.temenos.N3
-				elseif menu == 1006 then
-					destination = destination_array.temenos.N4
-				elseif menu == 1007 then
-					destination = destination_array.temenos.E
-				end
-			elseif menu >= 1011 and menu <= 1014 then
-				if menu == 1011 then
-					destination = destination_array.temenos.W2
-				elseif menu == 1012 then
-					destination = destination_array.temenos.W3
-				elseif menu == 1013 then
-					destination = destination_array.temenos.W4
-				elseif menu == 1014 then
-					destination = destination_array.temenos.E
-				end
-			elseif menu >= 1018 and menu <= 1021 then
-				if menu == 1018 then
-					destination = destination_array.temenos.E2
-				elseif menu == 1019 then
-					destination = destination_array.temenos.E3
-				elseif menu == 1020 then
-					destination = destination_array.temenos.E4
-				elseif menu == 1021 then
-					destination = destination_array.temenos.E
-				end
-			elseif menu >= 1023 and menu <= 1026 then
-				if menu == 1023 then
-					destination = destination_array.temenos.C2
-				elseif menu == 1024 then
-					destination = destination_array.temenos.C3
-				elseif menu == 1025 then
-					destination = destination_array.temenos.E
-				elseif menu == 1026 then
-					destination = destination_array.temenos.E
-				end
-			end
-		end
-    end
-				if zone ~= destination.zone then
-					log('Woa woa woa.')
-					return
-				end
 		    --------------------------------------------------------------------------------------
 		    log('Warping via ' .. npc.name .. ' to '..destination.display_name..'.')
 			--------------------------------------------------------------------------------------
-            -- update request
-            packet = packets.new('outgoing', 0x016)
-            packet["Target Index"] = windower.ffxi.get_player().index
-            actions:append(T {
-                packet = packet,
-                description = 'update request'
-            })
 
             -- menu change
             packet = packets.new('outgoing', 0x05B)
@@ -893,7 +815,7 @@ sub_commands = {
             actions:append(T {
                 packet = packet,
                 wait_packet = 0x052,
-                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation) ,
+                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),-- + 0.5,
                 description = 'same-zone move request'
             })
 
@@ -911,11 +833,20 @@ sub_commands = {
 
             actions:append(T {
             packet = packet,
-            wait_packet = 0x052,
+            wait_packet = 0x05B,
             expecting_zone = false,
-            delay = 2,
+            delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),
             description = 'complete menu'
             })
+
+            -- update request
+            packet = packets.new('outgoing', 0x016)
+            packet["Target Index"] = windower.ffxi.get_player().index
+            actions:append(T {
+                packet = packet,
+                description = 'update request'
+            })
+
             return actions
         end,
   
@@ -924,117 +855,14 @@ sub_commands = {
 		local packet = nil
 		local menu = p["Menu ID"]
 		local npc = current_activity.npc
-		local destination = nil
-    if zone == 38 then
-		if current_activity.sub_cmd == 'back' then
-			if menu <= 123 and menu >= 113 then
-				if menu == 123 then
-					destination = destination_array.apollyon.E1
-				elseif menu == 121 then
-					destination = destination_array.apollyon.SE3
-				elseif menu == 120 then
-					destination = destination_array.apollyon.SE2
-				elseif menu == 119 then
-					destination = destination_array.apollyon.SE1
-				elseif menu == 118 then
-					destination = destination_array.apollyon.E1
-				elseif menu == 117 then
-					destination = destination_array.apollyon.NE4
-				elseif menu == 116 then
-					destination = destination_array.apollyon.NE3
-				elseif menu == 115 then
-					destination = destination_array.apollyon.NE2
-				elseif menu == 114 then
-					destination = destination_array.apollyon.NE1
-				elseif menu == 113 then
-					destination = destination_array.apollyon.E1
-				end
-			elseif menu <= 112 and menu >= 102 then
-				if menu == 112 then
-					destination = destination_array.apollyon.SW3
-				elseif menu == 111 then
-					destination = destination_array.apollyon.SW2
-				elseif menu == 110 then
-					destination = destination_array.apollyon.SW1
-				elseif menu == 109 then
-					destination = destination_array.apollyon.E1
-				elseif menu == 108 then
-					destination = destination_array.apollyon.NW4
-				elseif menu == 107 then
-					destination = destination_array.apollyon.NW3
-				elseif menu == 106 then
-					destination = destination_array.apollyon.NW2
-				elseif menu == 105 then
-					destination = destination_array.apollyon.NW1
-				elseif menu == 104 then
-					destination = destination_array.apollyon.E1
-				elseif menu == 102 or menu == 103 then
-					destination = destination_array.apollyon.SE4
-				end
+		local destination = current_activity.args
+			if zone ~= destination.zone then
+				log('Woa woa woa.')
+				return
 			end
-		end
-    elseif zone == 37 then
-		if current_activity.sub_cmd == 'back' then
-			if menu <= 1026 and menu >= 1023 then
-				if menu == 1026 then
-					destination = destination_array.temenos.E
-				elseif menu == 1025 then
-					destination = destination_array.temenos.C2
-				elseif menu == 1024 then
-					destination = destination_array.temenos.C1
-				elseif menu == 1023 then
-					destination = destination_array.temenos.E
-				end
-			elseif menu <= 1021 and menu >= 1018 then
-				if menu == 1021 then
-					destination = destination_array.temenos.E3
-				elseif menu == 1020 then
-					destination = destination_array.temenos.E2
-				elseif menu == 1019 then
-					destination = destination_array.temenos.E1
-				elseif menu == 1018 then
-					destination = destination_array.temenos.E
-				end
-			elseif menu <= 1014 and menu >= 1011 then
-				if menu == 1014 then
-					destination = destination_array.temenos.W3
-				elseif menu == 1013 then
-					destination = destination_array.temenos.W2
-				elseif menu == 1012 then
-					destination = destination_array.temenos.W1
-				elseif menu == 1011 then
-					destination = destination_array.temenos.E
-				end
-			elseif (menu <= 1007 and menu >= 1004) or menu == 1000 then
-				if menu == 1007 then
-					destination = destination_array.temenos.N3
-				elseif menu == 1006 then
-					destination = destination_array.temenos.N2
-				elseif menu == 1005 then	
-					destination = destination_array.temenos.N1
-				elseif menu == 1004 then	
-					destination = destination_array.temenos.E
-				elseif menu == 1000 then
-					destination = destination_array.temenos.C3
-				end
-			end
-		end
-    end
-	
-				if zone ~= destination.zone then
-					log('Woa woa woa.')
-					return
-				end
 		    --------------------------------------------------------------------------------------
 		    log('Warping via ' .. npc.name .. ' to '..destination.display_name..'.')
 			--------------------------------------------------------------------------------------
-            -- update request
-            packet = packets.new('outgoing', 0x016)
-            packet["Target Index"] = windower.ffxi.get_player().index
-            actions:append(T {
-                packet = packet,
-                description = 'update request'
-            })
 
             -- menu change
             packet = packets.new('outgoing', 0x05B)
@@ -1069,7 +897,7 @@ sub_commands = {
             actions:append(T {
                 packet = packet,
                 wait_packet = 0x052,
-                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation) ,
+                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),-- + 0.5,
                 description = 'same-zone move request'
             })
 
@@ -1087,11 +915,20 @@ sub_commands = {
 
             actions:append(T {
             packet = packet,
-            wait_packet = 0x052,
+            wait_packet = 0x05B,
             expecting_zone = false,
-            delay = 2,
+            delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),
             description = 'complete menu'
             })
+
+            -- update request
+            packet = packets.new('outgoing', 0x016)
+            packet["Target Index"] = windower.ffxi.get_player().index
+            actions:append(T {
+                packet = packet,
+                description = 'update request'
+            })
+
             return actions
         end,
 
@@ -1102,62 +939,14 @@ sub_commands = {
 		local npc = current_activity.npc
 		local _apollyon_floor, item_id = find_first_apollyon_missing_floor()
         local _temenos_floor, item_id = find_first_temenos_missing_floor()
-		local destination = nil
+		local destination = current_activity.args
 		local chest_reminder = nil
-
-    if zone == 38 then
-			if _apollyon_floor then
-				destination = destination_array.apollyon[_apollyon_floor]
-				if (menu == 102 or menu == 103) then
+			if climb_unfinished then
+				if (menu == 102 or menu == 103 or menu == 1000) then
 					local chest = find_5k_chest(zone)
 					chest_reminder = 'End this climb at the '..chest..' chest.'
 				end
-			else
-				local chest = find_5k_chest(zone)
-				destination = destination_array.apollyon[chest]
 			end
-		-----------Cross-tower warp override--------------------------------------------------------------------------------------------------------------------------------
-        if (menu >= 104 and menu <= 108) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 108 or destination.menu_id < 104) then
-				destination = destination_array.apollyon.E1
-        ----------------West Tower--------------------------------------------------------------------------
-        elseif (menu >= 109 and menu <= 112) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 112 or destination.menu_id < 109) then
-				destination = destination_array.apollyon.E1
-        ----------------East Tower--------------------------------------------------------------------------
-        elseif (menu >= 113 and menu <= 117) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 117 or destination.menu_id < 113) then
-				destination = destination_array.apollyon.E1
-        ----------------Central Tower--------------------------------------------------------------------------
-        elseif (menu >= 118 and menu <= 121) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 121 or destination.menu_id < 118) then
-				destination = destination_array.apollyon.E1
-		elseif menu == 123 then
-			destination = destination_array.apollyon.E1 -- If we're in CN we only go to entrance.
-        end
-    elseif zone == 37 then
-			if _temenos_floor then
-				destination = destination_array.temenos[_temenos_floor]
-				if menu == 1000 then
-					local chest = find_5k_chest(zone)
-					chest_reminder = 'End this climb at the '..chest..' chest.'
-				end
-			else
-				local chest = find_5k_chest(zone)
-				destination = destination_array.temenos[chest]
-			end 
-
-        if (menu >= 1004 and menu <= 1007) and destination.menu_id ~= 1000 and (destination.menu_id > 1007 or destination.menu_id < 1004) then
-				destination = destination_array.temenos.E
-        ----------------West Tower--------------------------------------------------------------------------
-        elseif (menu >= 1011 and menu <= 1014) and destination.menu_id ~= 1000 and (destination.menu_id > 1014 or destination.menu_id < 1011) then
-				destination = destination_array.temenos.E
-        ----------------East Tower--------------------------------------------------------------------------
-        elseif (menu >= 1018 and menu <= 1021) and destination.menu_id ~= 1000 and (destination.menu_id > 1021 or destination.menu_id < 1018) then
-				destination = destination_array.temenos.E
-        ----------------Central Tower--------------------------------------------------------------------------
-        elseif (menu >= 1023 and menu <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1023) then
-				destination = destination_array.temenos.E
-		elseif menu == 1026 then -- If we're in CN we only go to entrance.
-			destination = destination_array.temenos.E
-        end
-    end
 				if zone ~= destination.zone then
 					log('Woa woa woa.')
 					return
@@ -1168,13 +957,6 @@ sub_commands = {
 					log(chest_reminder)
 				end
 			--------------------------------------------------------------------------------------
-            -- update request
-            packet = packets.new('outgoing', 0x016)
-            packet["Target Index"] = windower.ffxi.get_player().index
-            actions:append(T {
-                packet = packet,
-                description = 'update request'
-            })
 
             -- menu change
             packet = packets.new('outgoing', 0x05B)
@@ -1209,7 +991,7 @@ sub_commands = {
             actions:append(T {
                 packet = packet,
                 wait_packet = 0x052,
-                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation) ,
+                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),-- + 0.5,
                 description = 'same-zone move request'
             })
 
@@ -1227,11 +1009,20 @@ sub_commands = {
 
             actions:append(T {
             packet = packet,
-            wait_packet = 0x052,
+            wait_packet = 0x05B,
             expecting_zone = false,
-            delay = 2,
+            delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),
             description = 'complete menu'
             })
+
+            -- update request
+            packet = packets.new('outgoing', 0x016)
+            packet["Target Index"] = windower.ffxi.get_player().index
+            actions:append(T {
+                packet = packet,
+                description = 'update request'
+            })
+
             return actions
         end,
 		
@@ -1240,86 +1031,26 @@ sub_commands = {
 			local packet = nil
 			local menu = p["Menu ID"]
 			local npc = current_activity.npc
-			local destination = nil
+			local destination = current_activity.args
 		    local _apollyon_shuffle, item_id = find_shuffled_missing_apollyon_floor(menu)
             local _temenos_shuffle, item_id = find_shuffled_missing_temenos_floor(menu)
 			local chest_reminder = nil
-
-    if zone == 38 then
-        if _apollyon_shuffle then
-            destination = destination_array.apollyon[_apollyon_shuffle]
-			if (menu == 102 or menu == 103) then
-				local chest = find_5k_chest(zone)
-				chest_reminder = 'End this climb at the '..chest..' chest.'
-			end
-		else
-			local chest = find_5k_chest(zone)
-			destination = destination_array.apollyon[chest]
-        end
-    
-		-----------Cross-tower warp override--------------------------------------------------------------------------------------------------------------------------------
-        if (menu >= 104 and menu <= 108) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 108 or destination.menu_id < 104) then
-				destination = destination_array.apollyon.E1
-        ----------------West Tower--------------------------------------------------------------------------
-        elseif (menu >= 109 and menu <= 112) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 112 or destination.menu_id < 109) then
-				destination = destination_array.apollyon.E1
-        ----------------East Tower--------------------------------------------------------------------------
-        elseif (menu >= 113 and menu <= 117) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 117 or destination.menu_id < 113) then
-				destination = destination_array.apollyon.E1
-        ----------------Central Tower--------------------------------------------------------------------------
-        elseif (menu >= 118 and menu <= 121) and (destination.menu_id ~= 102 and destination.menu_id ~= 103) and (destination.menu_id > 121 or destination.menu_id < 118) then
-				destination = destination_array.apollyon.E1
-		elseif menu == 123 then
-			destination = destination_array.apollyon.E1 -- If we're in CN we only go to entrance.
-        end
-    elseif zone == 37 then
-			if _temenos_shuffle then
-				destination = destination_array.temenos[_temenos_shuffle]
-				if menu == 1000 then
+			if climb_unfinished then
+				if (menu == 102 or menu == 103 or menu == 1000) then
 					local chest = find_5k_chest(zone)
 					chest_reminder = 'End this climb at the '..chest..' chest.'
 				end
-			else
-				local chest = find_5k_chest(zone)
-				destination = destination_array.temenos[chest]
-			end 
-
-        if (menu >= 1004 and menu <= 1007) and destination.menu_id ~= 1000 and (destination.menu_id > 1007 or destination.menu_id < 1004) then
-				destination = destination_array.temenos.E
-        ----------------West Tower--------------------------------------------------------------------------
-        elseif (menu >= 1011 and menu <= 1014) and destination.menu_id ~= 1000 and (destination.menu_id > 1014 or destination.menu_id < 1011) then
-				destination = destination_array.temenos.E
-        ----------------East Tower--------------------------------------------------------------------------
-        elseif (menu >= 1018 and menu <= 1021) and destination.menu_id ~= 1000 and (destination.menu_id > 1021 or destination.menu_id < 1018) then
-				destination = destination_array.temenos.E
-        ----------------Central Tower--------------------------------------------------------------------------
-        elseif (menu >= 1023 and menu <= 1025) and destination.menu_id ~= 1000 and (destination.menu_id > 1025 or destination.menu_id < 1023) then
-				destination = destination_array.temenos.E
-		elseif menu == 1026 then -- If we're in CN we only go to entrance.
-			destination = destination_array.temenos.E
-        end
-		if menu == destination.menu_id then
-				destination = destination_array.temenos.E
-			log('Cannot warp to same floor. Suspicious packets averted.')
-		end
-    end
-				if zone ~= destination.zone then
-					log('Woa woa woa.')
-					return
-				end
-		    --------------------------------------------------------------------------------------
-		    	log('Warping via ' .. npc.name .. ' to '..destination.display_name..'.')
-				if chest_reminder then
-					log(chest_reminder)
-				end
+			end
+			if zone ~= destination.zone then
+				log('Woa woa woa.')
+				return
+			end
+		--------------------------------------------------------------------------------------
+			log('Warping via ' .. npc.name .. ' to '..destination.display_name..'.')
+			if chest_reminder then
+				log(chest_reminder)
+			end
 			--------------------------------------------------------------------------------------
-            -- update request
-            packet = packets.new('outgoing', 0x016)
-            packet["Target Index"] = windower.ffxi.get_player().index
-            actions:append(T {
-                packet = packet,
-                description = 'update request'
-            })
 
             -- menu change
             packet = packets.new('outgoing', 0x05B)
@@ -1354,7 +1085,7 @@ sub_commands = {
             actions:append(T {
                 packet = packet,
                 wait_packet = 0x052,
-                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation) ,
+                delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),-- + 0.5,
                 description = 'same-zone move request'
             })
 
@@ -1372,11 +1103,20 @@ sub_commands = {
 
             actions:append(T {
             packet = packet,
-            wait_packet = 0x052,
+            wait_packet = 0x05B,
             expecting_zone = false,
-            delay = 2,
+            delay = wiggle_value(settings.simulated_response_time, settings.simulated_response_variation),
             description = 'complete menu'
             })
+
+            -- update request
+            packet = packets.new('outgoing', 0x016)
+            packet["Target Index"] = windower.ffxi.get_player().index
+            actions:append(T {
+                packet = packet,
+                description = 'update request'
+            })
+
             return actions
         end,		
 	enter = function(current_activity, zone, p, settings)

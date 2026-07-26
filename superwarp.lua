@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         Odyssey support implementation: Staticvoid
         Apollyon  and  Temenos support: Staticvoid
 		Mog Garden support            : Staticvoid
+        Campaign support              : Staticvoid
+        Incursion support             : Staticvoid
+        Walk Of Echoes support        : Staticvoid
         Maintenance			          : Staticvoid
 ]]
 
@@ -62,7 +65,6 @@ resources = require('resources')
 
 require('sendall')
 require('fuzzyfind')
-
 maps = require('map/maps')
 
 warp_list = T{}
@@ -595,7 +597,7 @@ local function find_npc(needles)
         if npc and npc.valid_target then
             local diff_vec = V{npc.x - px, npc.y - py, npc.z - pz}
             local true_distance = diff_vec:length()
-            if true_distance < 25 then
+            if true_distance < 50 then
                 if not target_npc or npc.distance < distance then
                     target_npc = npc
                     distance = npc.distance
@@ -762,11 +764,11 @@ local function do_sub_cmd(map_name, sub_cmd, args)
         if state.loop_count > 0 then
             log(npc.name..' found, but too far! Retrying...')
             state.loop_count = state.loop_count - 1
-        	do_sub_cmd:schedule(settings.retry_delay, map_name, sub_cmd, args)
+            do_sub_cmd:schedule(settings.retry_delay, map_name, sub_cmd, args)
         else
             log(npc.name..' found, but too far!')
             timing.warp_cmd_time = nil
-        end
+        end    
     elseif npc and npc.id and npc.index and dist <= 6^2 then
         current_activity = {type=map_name, sub_cmd=sub_cmd, args=args, npc=npc, warp_ident = warp_ident}
         if current_activity.sub_cmd then
@@ -1086,7 +1088,7 @@ local function magic_map()
 
                             local true_distance = diff_vec:length()
 
-                            if true_distance < 25 then  --2D distance checks are squared, these are not.
+                            if true_distance < 50 then  --2D distance checks are squared, these are not.
                                 if not best.distance or npc.distance < best.distance then
                                     best.map_name = last_cache.map_name
                                     best.interaction = interaction_type
@@ -1129,7 +1131,7 @@ local function magic_map()
 
                             local true_distance = diff_vec:length()
 
-                            if true_distance < 25 then --2D distance checks are squared, these are not.
+                            if true_distance < 50 then --2D distance checks are squared, these are not.
                                 if not best.distance or npc.distance < best.distance then
                                     best.map_name = map_name
                                     best.interaction = interaction_type
@@ -1379,6 +1381,10 @@ local function auto_shutdown(id) -- Ensure that if the same process ID is still 
         last_activity = current_activity
         current_activity = nil
         reset(true)
+    elseif not current_activity then
+        log('If you become menu locked use //sw reset to clear.')
+        debug("No current activity, doing nothing.")
+        return
     end
 end
 
@@ -1389,82 +1395,33 @@ local function read_warp_state(i,id)
     elseif current_activity and current_activity.action_index ~= i then
         debug("Warp state has progressed, leaving it to its own devices.")
         return
-    elseif not current_activity then
-        log('If you become menu locked use //sw reset to clear.')
-        debug("No current activity, doing nothing.")
-        return
     end
     auto_shutdown:schedule(5, id)
 end
 
-local function movement_confirm(basic_check, menu_confirm)
-    local player = windower.ffxi.get_mob_by_target('me')
-    local diff_vector = V{prev_location.x - player.x, prev_location.y - player.y, prev_location.z - player.z}
-    local has_moved = diff_vector:length() >= 50
-    if basic_check then
-        if has_moved then
-            return true
-        else
-            return false
+local function reset_action_queue() -- Clean solution to one of the toughest bugs i've had to overcome.
+    local wait_packets = {
+        nil,
+        0x052,
+        0x05B,
+        nil,
+    }
+    for i = 1, 4 do
+        if current_activity.action_queue[i] then
+            current_activity.action_queue[i].wait_packet = wait_packets[i]
         end
     end
-    if state.warp_interrupted then
-        if has_moved then
-            if not state.warp_confirmed then
-                debug("Detected an interrupted warp, confirming the warp with complete menu.")
-                packets.inject(menu_confirm.packet)
-                last_activity = current_activity
-                current_activity = nil
-                state.warp_interrupted = false
-                state.warp_confirmed = true
-                state.loop_count = 0
-                if player.name == warp_sender then
-                    warp_listener(true, player.name)
-                elseif current_warp_id then
-                    windower.send_ipc_message('confirm '..current_warp_id..' '..player.name)
-                end
-                return true
-            end
-            return true
-        else
-            return false
-        end
-    end
-end
-
-local function limbus_state_reader(executor)
-    if executor then
-        local limbus_warp_retainer = current_activity.action_queue[4]
-        movement_confirm:schedule(8, false, limbus_warp_retainer)
+    current_activity.action_index = 1
+    local limbus_action = current_activity.action_queue[1]
+    packets.inject(limbus_action.packet)
+    current_activity.action_index = current_activity.action_index + 1
+    if current_activity.retried_once then
+        current_activity.retry_attempted = true
+        log('Trying one more time to send the move request...')
     else
-        local phase = current_activity.action_index
-        if phase ~= 4 then -- Early exit for 1 2 and 3
-            return false
-        elseif phase == 4 then
-            if not movement_confirm(true) then
-                state.warp_confirmed = false
-                state.warp_interrupted = true
-                reset(true)
-                debug('Post-warp menu confirm stage reached and no movement detected, evading invalid state; Aborted warp, retrying if necessary...')
-                if not movement_confirm(true) then  -- Sometimes when the warp has reached this phase the release can trigger the server to move you. 
-                    if not current_activity and state.loop_count > 0 then
-                        handle_warp:schedule(0.5, state.current_warp, state.current_args, false, state.loop_count - 1, state.current_sub_cmd)
-                    end
-                else
-                    local player = windower.ffxi.get_mob_by_target('me')
-                    if player.name == warp_sender then
-                        warp_listener(true, player.name)
-                    elseif current_warp_id then
-                        windower.send_ipc_message('confirm '..current_warp_id..' '..player.name)
-                    end
-                end
-                return true
-            else
-                state.warp_confirmed = true
-                return false
-            end
-        end
+        log('There was "Nothing out of the ordinary here.", Attempting to retry the warp.')
     end
+    current_activity.retried_once = true
 end
 
 local function perform_next_action()
@@ -1498,26 +1455,31 @@ local function perform_next_action()
             debug("waiting for packet 0x"..current_action.wait_packet:hex().." for action "..tostring(current_activity.action_index)..' '..(current_action.description or ''))
             current_action.wait_start = os.time()
             if not current_action.timeout then
-                current_action.timeout = settings.default_packet_wait_timeout
+                if in_limbus_zone and current_activity.action_index == 3 then
+                    current_action.timeout = 2.5  -- If we do not receive our wait packet quickly at this phase of a limbus warp we need to act fast to avoid divergent state.
+                else
+                    current_action.timeout = 3--settings.default_packet_wait_timeout
+                end
             end
             local fn = function(s, ca, i, p, d, wi)
                 local action = ca.action_queue[i]
                 if action and ca.action_index == i and wi == warp_ident and action.wait_packet == p and not ca.canceled then --We no longer get false timeouts which would thwart otherwise would be successful warps.
                     debug("timed out waiting for packet 0x"..p:hex().." for action "..tostring(i)..' '..(d or ''))
-                    if s.loop_count > 0 then
-                        reset(true)
-                        log("Timed out waiting for response from the menu. Retrying...")
-                        handle_warp:schedule(settings.retry_delay, s.current_warp, s.current_args, false, s.loop_count - 0.2, s.current_sub_cmd)
+                    if in_limbus_zone and current_activity.action_index == 3 and state.loop_count > 0 and not current_activity.retry_attempted then  -- If we timeout at this phase and it is not because of interrupt send the 0x05C again because it was dropped.
+                        reset_action_queue()
                     else
-                        reset(true)
-                        log("Timed out waiting for response from the menu.")
+                        if s.loop_count > 0 then
+                            reset(true)
+                            log("Timed out waiting for response from the menu. Retrying...")
+                            handle_warp:schedule(settings.retry_delay, s.current_warp, s.current_args, false, s.loop_count - 0.2, s.current_sub_cmd)
+                        else
+                            reset(true)
+                            log("Timed out waiting for response from the menu.")
+                        end
                     end
                 end
             end
             fn:schedule(current_action.timeout, state, current_activity, current_activity.action_index, current_action.wait_packet, current_action.description, warp_ident)
-            if in_limbus_zone and current_activity.action_index == 4 then  -- Often when limbus warps have gotten to this point and then get interrupted from being attacked the warp can still go through leading to missing data bar for that floor. Handle these cases by scheduling a check.
-                limbus_state_reader(true)
-            end
         elseif not state.fast_retry and current_action.delay and current_action.delay > 0 then
             debug("delaying action "..tostring(current_activity.action_index)..' '..(current_action.description or '')..' for '.. current_action.delay..'s...')
             local delay_seconds = current_action.delay
@@ -1525,16 +1487,6 @@ local function perform_next_action()
             last_action = current_action
             perform_next_action:schedule(delay_seconds)
         elseif current_action.packet then
-            if in_limbus_zone then  --Outside limbus skip.
-                if limbus_state_reader() then --If it is true that we have not yet moved stop this function from injecting packet.
-                    if current_activity then
-                        state.loop_count = 0
-                        reset(true)
-                        -- Asynchronous / race-conditions could theoretically allow for this point to be reached. Need more data.
-                    end
-                    return
-                end
-            end
             -- just a packet, inject it.
             debug("injecting packet "..tostring(current_activity.action_index)..' '..(current_action.description or ''))
             packets.inject(current_action.packet)
@@ -1572,7 +1524,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local current_action = current_activity.action_queue[current_activity.action_index]
         if current_action and current_action.wait_packet and current_action.wait_packet == id and not state.warp_interrupted then
             local message_type = data:unpack('b4', 5)
-            if id ~= 0x052 or id == 0x052 and message_type ~= 2 then -- Block event skips from triggering wait packet confirmation.     
+            local paquet = packets.parse('incoming', data)
+            if id == 0x05C or (id == 0x052 and message_type ~= 2) or (id == 0x05B and paquet['ID'] == windower.ffxi.get_mob_by_target('me').id) then -- Filter event skips and other false positives.
                 debug("received packet 0x"..id:hex().." for action "..tostring(current_activity.action_index)..' '..(current_action.description or ''))
                 current_action.wait_packet = nil
                 current_action.incoming_packet = packets.parse('incoming',data)
@@ -1759,7 +1712,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 current_activity = nil
                 return false
             end
-        elseif current_activity and state.warp_interrupted then
+        elseif current_activity and (state.warp_interrupted or state.loop_count > 0) then
             debug("Prevented menu from blocking packet exchanges, reading state machine...")
             local i = current_activity and current_activity.action_index
             local ident = current_activity.warp_ident -- Capture Warp ID now and check in 5 seconds to determine whether a reset is needed.
@@ -1854,7 +1807,7 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
 end)
 windower.register_event('load', function()
     if not settings.understood then
-        windower.add_to_chat(207,'\n Welcome to superwarp 1.1.2. Now use sw in place of  hp, wp, sg, un, so, li, ew, ab etc -  for all warp commands!!\n The new smart-command is "//sw" by itself. It autohandles all warp scenarios where a destination need not be specified. i.e. so port or ab enter. It works as any subcommand for any map except others where multiple are usable, in those cases it always serves as one. i.e. next cmd for limbus.')
+        windower.add_to_chat(207,' \nWelcome to superwarp 1.1.4. \n \n Now use sw in place of  hp, wp, sg, un, so, li, ew, ab etc -  for all warp commands!!\n The new smart-command is "//sw" by itself. It autohandles all warp scenarios where a destination need not be specified. i.e. so port or ab enter. It works as any subcommand for any map except others where multiple are usable, in those cases it always serves as one. i.e. next cmd for limbus.')
         windower.add_to_chat(207,' All legacy functionality is still in place.')
         windower.add_to_chat(207,' sw help to list all information.')
         windower.add_to_chat(207,' sw understood to stop displaying these messages on load.')

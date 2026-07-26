@@ -18,7 +18,7 @@ return T{
         return mlist
     end,
     validate = function(menu_id, zone, current_activity)
-		if not (  menu_id == 575 or menu_id == 1015 or menu_id == 808 or menu_id == 546 or menu_id == 896 or menu_id == 440 ) then
+		if not (  menu_id == 575 or menu_id == 1015 or menu_id == 808 or menu_id == 546 or menu_id == 896 or menu_id == 440 or menu_id == 1089) then
             return "Incorrect menu detected! Menu ID: "..menu_id
         end
         if current_activity.sub_cmd == 'zone' and not entry_zones:contains(zone) then
