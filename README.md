@@ -359,3 +359,11 @@ Thanks to Staticvoid for researching and implementing the Sortie, Odyssey, Temen
 
 #### v1.1.3
 - **Resolved**: Limbus map update (major changes, removed floors, floor location changes, chest tracking format update and more.)
+
+#### v1.1.4
+- **Resolved**: Limbus "Nothing out of the ordinary." bug. Solved.
+- **Improvement**: Limbus warps are now much quicker. Map has been reworked to make warps cleaner, quicker and more efficient.
+- **Improvement**: Sortie, Odyssey maps have been reworked and made more efficient.
+- **Improvement**: Added to Escha map; enter / exit for Reisenjima Sanctorium via Etched Rock on either side. smartcommand autohandles each. (//sw)  - following the reduction of phantom gem from 30 to 10.
+- **Improvement**:  Added to Abyssea map; enter / exit for Abyssea - Empyreal Paradox  via Transcendental Radiance in Qufim / Cavernous Maw from inside. smartcommand autohandles each (//sw) - following the reduction of phantom gem from 30 to 10.
+

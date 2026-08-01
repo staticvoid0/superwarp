@@ -220,7 +220,7 @@ function send_all_with_confirm(msg, delay, participants, on_complete, readout)
 
     -- start completion watcher
     coroutine.schedule(function()
-        local timeoutinator = os.clock() + 16
+        local timeoutinator = os.clock() + 18
         local complete = true
         while pending_confirms[warp_id] and active_warp_id == warp_id and os.clock() < timeoutinator do
             local entry = pending_confirms[warp_id]
